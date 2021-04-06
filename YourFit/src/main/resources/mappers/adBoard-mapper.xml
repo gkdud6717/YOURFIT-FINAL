@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="adBoardMapper">
+
+
+	<insert id="insertBoard" parameterType="adboard">
+		INSERT INTO AD (AD_NO, AD_TITLE, AD_CONTENT, AD_COUNT, AD_MNO, AD_DATE, STATUS)
+		VALUES('AD'||AD_SEQ.NEXTVAL, #{ad_Title}, #{ad_Content}, 0, #{ad_Mno}, #{ad_Date},'Y')
+	</insert>
+	
+	<insert id="insertBoardFile" parameterType="boardfile">
+		
+		<selectKey keyProperty="ad_No" resultType="string" order="BEFORE">
+			SELECT AD_SEQ.CURRVAL FROM DUAL
+		</selectKey>
+		
+		INSERT INTO BOARD_FILE(F_NO, F_ADNO, F_TYPE, F_NAME, F_CNAME, F_UPLOADDATE)
+		VALUES(BOARD_FILE_SEQ.NEXTVAL, 'AD'||#{ad_No}, '1', #{f_Name}, #{f_Cname}, SYSDATE)
+	</insert>
+	
+	<select id="selectOneBoard" parameterType="string" resultType="adboard">
+		SELECT AD.*, 
+        (SELECT M_NICK FROM MEMBER WHERE M_NO = AD.AD_MNO) NICK,
+        (SELECT F_CNAME FROM BOARD_FILE WHERE F_ADNO = AD.AD_NO) NO
+		FROM AD AD
+        WHERE AD_NO = #{ad_No}
+        
+	</select>
+	
+	<select id="selectBoardFileList" resultType="boardfile">
+		SELECT * FROM BOARD_FILE WHERE F_ADNO = #{f_adno}
+	</select>
+
+	<update id="updateReadCount" parameterType="string">
+		UPDATE AD
+		SET AD_COUNT = AD_COUNT + 1
+		WHERE AD_NO = #{ad_No}
+	</update>
+	
+	<delete id="deleteBoardFile" parameterType="string">
+		DELETE FROM Board_File
+		WHERE F_ADNO = #{ad_No}
+	</delete>
+	
+	<insert id="updateBoardFile" parameterType="boardfile">
+		INSERT INTO BOARD_FILE(F_NO, F_ADNO, F_TYPE, F_NAME, F_CNAME, F_UPLOADDATE) VALUES
+		(BOARD_FILE_SEQ.NEXTVAL, #{f_Adno}, '1', #{f_Name}, #{f_Cname},
+		 SYSDATE )
+	</insert>
+	
+	<update id="updateBoard" parameterType="adboard">
+		UPDATE AD
+		SET AD_TITLE = #{ad_Title},
+		    AD_CONTENT = #{ad_Content},
+		    AD_DATE = #{ad_Date}
+		WHERE AD_NO = #{ad_No}
+	</update>
+	
+	<delete id="deleteBoard" parameterType="string">
+		DELETE FROM AD
+		WHERE AD_NO = #{ad_No}
+	</delete>
+</mapper>
+
+
+
+
+
+
+
+
+
+

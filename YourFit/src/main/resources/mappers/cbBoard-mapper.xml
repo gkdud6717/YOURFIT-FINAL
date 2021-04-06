@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cbBoard">
+
+	<resultMap type="cbBoard" id="cbBoard"></resultMap>
+	
+	<select id="selectcbBoard" resultMap="cbBoard">
+		SELECT BO.*
+		FROM(SELECT ROWNUM RN, B.* 
+   			FROM(SELECT * FROM CAL_BOARD 
+        	ORDER BY CB_COUNT DESC) B 
+     	WHERE ROWNUM <![CDATA[ < ]]> 11) BO
+	</select>
+	
+	<select id="selectcbBoardTotalContents" resultType="_int">
+		SELECT COUNT(*) FROM CAL_BOARD
+	</select>
+	
+	<select id="selectOnecbBoard" parameterType="String" resultType="cbBoard">
+		SELECT * FROM CAL_BOARD WHERE CB_NO = #{cb_no}
+	</select>
+	
+	<update id="updatechBoardCnt" parameterType="String">
+		UPDATE CAL_BOARD SET
+		CB_COUNT = CB_COUNT+1
+		WHERE CB_NO = #{cb_no}
+	</update>
+		
+	<select id="cbBoardUpdateView" parameterType="String" resultType="cbBoard">
+		SELECT * FROM CAL_BOARD WHERE CB_NO = #{cb_no}
+	</select>
+	
+	<delete id="deletecbBoard" parameterType="String">
+		DELETE FROM CAL_BOARD
+		WHERE CB_NO = #{cb_no}
+	</delete>
+	
+	<select id="cbBoardSearch" parameterType="String" resultMap="cbBoard">
+		SELECT * FROM CAL_BOARD
+		WHERE CB_FOODNAME LIKE '%' || #{keyword} || '%'
+	</select>
+	
+	<select id="cbBoardSearchCnt" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM CAL_BOARD
+		WHERE CB_FOODNAME LIKE '%' || #{keyword} || '%'
+	</select>
+</mapper>
+
+

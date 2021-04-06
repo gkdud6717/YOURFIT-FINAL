@@ -1,0 +1,120 @@
+@charset "UTF-8";
+
+h4, h3, h2, td, .content, .tableDetail, #btnReset, #btnSave, #btnBack, #dt_content, #ht_content, #n_content, .commentbtn, #commentup, #commentupdate, #commentdelete, textarea {font-family: 'InfinitySans-RegularA1';}  
+
+.content {
+	display: inline-block;
+	width: 100%;
+	border-bottom: 2px solid black;
+	padding-bottom: 20px;
+}		
+
+.tableDetail {
+	text-align: center;
+	/*border-right: 0.5px solid lightgray;
+	border-left: 0.5px solid lightgray;*/
+	width: -webkit-fill-available;
+	border: 10px solid #e4efeb;
+	border-radius: 20px;
+}
+	
+.tableDetail td {
+	border-bottom: 1px solid lightgrey;
+	border-top: 1px solid lightgrey;
+	padding: 9px;
+	text-align: left;
+}
+
+#btnReset, #btnSave {
+    background: #f8e9e2;
+    color: #464646;
+    margin-left: 15px;  
+}
+	
+#btnBack  {
+    background: #f8e9e2;
+	color: #464646;
+    border-color: #ccc;
+}
+	
+#btnReset:hover, #btnSave:hover, #btnBack:hover {
+ 	background: #f8c7b8;
+ 	cursor: pointer;
+ }
+ 
+#td_icon {color: black!important; margin-right:8px;}
+
+#content_td {height: 400px; line-height: 20px;}
+
+#n_content {
+	height: 380px; 
+	resize: none; 
+	background-color: white; 
+	padding: 20px;
+	line-height: 2.5;
+}
+
+#ht_content {
+	height: 200px; 
+	resize: none; 
+	background-color: white; 
+	padding: 20px;
+	line-height: 2.5;
+}
+
+#dt_content {
+	height: 380px; 
+	resize: none; 
+	background-color: white; 
+	padding: 20px;
+	line-height: 2.5;
+}
+
+#commlist {padding: 20px;}
+
+#co_Content {resize: none; width: 100%; height: 75px; padding: 10px;}
+
+#coContent, #htContent, #dtContent {resize: none; width: 100%; height: 75px; padding: 10px;}
+
+.commentbtn {
+	background: #e4efeb;
+	color: #464646;
+    border-color: #c6ebd9!important;
+    border: 0px;
+    padding: 7px;
+    width: 60px;
+    margin-top: 35px;
+}
+
+#commentup, #commentupdate, #commentdelete {
+	background: #e4efeb;
+	color: #464646;
+    border-color: #c6ebd9!important;
+    border: 0px;
+    padding: 7px;
+    width: 100px;
+	
+}
+
+.commentbtn:hover, #commentup:hover, #commentupdate:hover, #commentdelete:hover {
+	background: #c6ebd9;
+ 	cursor: pointer;
+}
+
+
+.vod_icos>li{
+	float:left;
+	width:25%;
+	text-align:left;
+	padding:7px 0;
+}
+li{
+	list-style:none;
+}
+.embed_txt_area{
+	margin:32px 0px 30px;
+}
+
+#img_dt {width: 100%; height: 100%;}
+
+#h4 {margin-bottom: 5px; font-family: 'InfinitySans-RegularA1';}

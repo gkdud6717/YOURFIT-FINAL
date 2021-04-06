@@ -1,0 +1,115 @@
+@charset "UTF-8";
+
+.T, .T2, .SS, #B, p, tr, td, th, option {font-family: 'InfinitySans-RegularA1';}
+
+.T{
+    font-size: inherit;   
+    width: 150px;
+    margin-left: 15px;
+    text-align: center;
+    vertical-align: middle; 
+    background-color: #f8e9e2; 
+    border-top: 1px solid #a2a2a2;
+	border-bottom: 1px solid #a2a2a2;
+}
+
+.T2{
+    font-size: inherit;
+    margin-top: 15px;
+    font-size: x-large;
+    font-weight: bold; 
+    text-align: center
+}
+
+.I { 
+    margin-left: 20px;
+    height: 35px;  
+}
+
+table { border-collapse: collapse;}
+
+#Final > table {width: 100%; text-align: center;}
+
+.SS {
+    font-size: x-large;
+    font-weight: 1000;
+    margin-left: 33px;
+}
+
+.CD {
+    font-weight: normal;
+    font-size: initial;
+    margin-left: 3px;
+}
+
+.SS, .CD {width: 40%; display: inline; color: navy; font-family: 'InfinitySans-RegularA1';}
+
+#centered {display: table; margin-left: auto; margin-right: auto;}
+
+#B {
+	font-family: 'InfinitySans-RegularA1';
+	background: #f8e9e2;
+	color: #464646;
+	border: 1px solid #d6d4d4;
+	margin-bottom: 50px;
+}
+
+#B:hover {
+	background: #f8c7b8;
+	cursor: pointer;
+}
+
+
+.I2 > input {
+    width: 50%; 
+    height: 32px;
+    border-width: 1px; 
+    border-color:  grey; 
+    border-radius: 2px;
+    float:left;
+    margin-left: 10px;
+}
+
+.I2 > div {margin-top: 10px;}
+
+#OP {
+    width: 90%; 
+    height: 40px;
+    border-width: 1px; 
+    border-color:  grey; 
+    border-radius: 2px; 
+    margin: 10px auto 10px 10px;
+    float:left;
+}
+
+#result {float: left; height: 100%; font-family: 'InfinitySans-RegularA1'; margin-bottom: 40px; border-top: 1px solid lightgray; border-bottom: 1px solid lightgray; padding-bottom: 20px;}
+
+#p {font-size: small; color:black; font-weight: lighter; font-family: 'InfinitySans-RegularA1'; margin-bottom:0px; float: right; margin-right: 8px;}
+	
+#wrap-contents {padding: 3rem 0; border-top: 1px dashed #dadada;}  
+
+#title, #info {
+	font-family: 'InfinitySans-RegularA1';
+}
+
+#h1tag {
+	border-bottom: 2px solid black;
+}
+
+.color {
+	color: #f08969;
+}
+
+
+td {
+	width: 400px;
+	border-top: 1px solid #a2a2a2;
+	border-bottom: 1px solid #a2a2a2;
+	padding: 10px 7px 10px 15px;
+}
+
+#table { margin: 30px 30px 30px 5px; width: 500px;}
+
+#img2 {float:left; width: 40%; margin-top: 5px; margin-left: 10px;}
+
+#p2 {float:left; margin-top: 40px;}

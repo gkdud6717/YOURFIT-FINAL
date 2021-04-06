@@ -1,0 +1,72 @@
+@charset "UTF-8";
+
+.content, #btn-back, #btnReset, #btnSave, #btnDel, input, #updateNotice, .tableDetail, .co_table, input, a, textarea {font-family: 'InfinitySans-RegularA1'!important;}
+
+#centered {display: table; margin-left: auto; margin-right: auto;}
+
+#updateNotice, .tableDetail, .co_table {
+	text-align: center;
+	border-right: 0.5px solid lightgray;
+	width: -webkit-fill-available;
+}
+	
+#updateNotice th, .tableDetail th, .co_table th {
+      padding:10px;
+	  border-top:solid 1px #999;
+	  border-bottom:solid 1px #b2b2b2;
+	  border-right: 0.5px solid lightgrey;
+	  border-left: 0.5px solid lightgrey;
+	  background-color:#f8e9e2;
+	  color:#333;
+	  font-weight:bold;
+	  line-height:20px;
+	  vertical-align:top; 
+	  width: 150px;
+}
+
+th {width: 150px;}
+	
+#update_td, #updateNotice td, .tableDetail td, .co_table td {
+	border-bottom: 1px solid lightgrey;
+	border-top: 1px solid lightgrey;
+	padding: 9px;
+	text-align: left;
+}
+
+#n_content, #co_Content {height: 350px; resize: none;}
+
+.content {
+	display: inline-block;
+	width: 100%;
+	border-bottom: 2px solid black;
+	padding-bottom: 20px;
+}
+
+#btnReset, #btnSave{
+    background: #f8e9e2;
+    color: #464646; 
+    float: right;	
+}
+
+#btnDel {background: #f8c7b8; float: right;}
+
+#btnDel:hover {background: #ffe6cc; cursor: pointer;}
+
+#btnReset, #btnDel {margin-right: 10px;}
+
+#btnDel {color: red;}
+
+#btnBack, #btn-back  {
+    background: #f8e9e2;
+	color: #464646;
+    border-color: #ccc;
+    float: left;
+}
+	
+#btnReset:hover, #btnSave:hover, #btnBack:hover, #btn-back:hover{
+ 	background: #f8c7b8;
+ 	cursor: pointer;
+ }
+ 
+
+#icon {color:black !important; background-color: white; font-size: 40px; margin-right: 10px;}

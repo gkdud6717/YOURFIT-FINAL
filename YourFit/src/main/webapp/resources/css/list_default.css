@@ -1,0 +1,47 @@
+@charset "UTF-8";
+
+#searchBtn, #searchType > option, th, td, input, h3, h4, span {font-family: 'InfinitySans-RegularA1'!important;}
+
+#centered {display: table; margin-left: auto; margin-right: auto;}
+
+th, td {color: black; border: 1px solid lightgrey; font-family: 'InfinitySans-RegularA1'; text-align: center;}
+
+th {background-color: #f8e9e2; text-align: center !important;}
+
+#icon {color:black !important; background-color: white; font-size: 40px; margin-right: 10px;}
+
+
+#searchBtn {background: #f8e9e2; padding: 10px; border: 1px solid #f8c7b8; border-radius: 10%;}
+    
+#searchBtn:hover {background: #f8c7b8; cursor: pointer;}
+    
+select, option {padding: 10px;}    
+
+input {padding: 8px;}
+
+.page-title h2 {font-family: 'InfinitySans-RegularA1'; font-size: 32px;}
+
+#btn-add {   background: #f8e9e2;
+    color: #464646;
+    font-family: 'InfinitySans-RegularA1';
+    }
+    
+#btn-add:hover {background: #f8c7b8; cursor: pointer;}
+
+h4 {float: right!important;}
+
+#slide-right {
+   overflow: hidden;
+}
+
+#slide-right h2 {
+   animation: 1s slide-right;
+}
+@keyframes slide-right {
+    from {
+       margin-left: -200px;
+    }
+    to {
+       margin-left: 0%;
+    }
+ }

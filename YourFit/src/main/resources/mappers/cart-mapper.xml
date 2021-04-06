@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cartMapper">
+
+<!-- property 는 member의 변수이름 cloumn은 데이터베이스 컬럼이름(대소문자 상관x) -->
+	<resultMap type="Cart" id="CartMap">
+	<id property="c_No" column="c_No"/>
+		<result property="c_Amount" column="c_Amount"/>
+		<result property="c_Price" column="c_Price"/>
+		<result property="c_Pno" column="c_Pno" />
+		<result property="c_Mno" column="c_Mno" />
+		<result property="p_Name" column="p_Name" />
+		<collection property="files" ofType="productimg">
+			<id property="i_No" column="i_No"/>
+			<result property="i_ChangeName" column="I_CHANGENAME" />
+			<result property="i_UploadDate" column="I_UPLOADDATE" />
+			<result property="i_Pno" column="i_Pno" />
+		</collection>
+	</resultMap>
+	
+	<insert id="insertCart" parameterType="Cart">
+		INSERT INTO CART (C_NO, C_AMOUNT, C_PRICE, C_PNO, C_MNO) VALUES (CART_SEQ.NEXTVAL, #{c_Amount}, #{c_Price}, #{c_Pno}, #{c_Mno})
+
+	</insert>
+	
+	<select id="cartList" parameterType="_int" resultMap="CartMap">
+       SELECT C.*, PRODUCT_IMG.*,
+			(SELECT M_NICK FROM MEMBER WHERE M_NO = C.C_MNO) C_NICK, 
+			(SELECT P_NAME FROM PRODUCT WHERE P_NO = C.C_PNO GROUP BY P_NAME) P_NAME
+		FROM CART C
+        JOIN PRODUCT_IMG ON(C.C_PNO = PRODUCT_IMG.I_PNO)
+   		WHERE C_MNO = #{c_Mno}
+	</select>
+	
+	<select id="sumMoney" parameterType="_int" resultType="Integer">
+		SELECT NVL(SUM(C_AMOUNT * C_PRICE), 0) SUMMONEY
+        FROM PRODUCT P, CART C
+        WHERE P.P_NO = C.C_PNO AND C.C_MNO = #{c_Mno} 
+	</select>
+	
+	<delete id="cartDelete" parameterType="_int">
+		    DELETE FROM CART WHERE C_NO=#{c_No}
+	</delete>
+	
+	<select id="selectTotalCount" parameterType="_int" resultType="Integer">
+		SELECT NVL(SUM(C_AMOUNT), 0)
+   	 	FROM CART
+   		WHERE C_MNO = #{c_Mno}
+	</select>
+</mapper>

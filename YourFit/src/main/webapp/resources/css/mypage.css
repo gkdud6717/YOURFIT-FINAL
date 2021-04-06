@@ -1,0 +1,86 @@
+@charset "UTF-8";
+	
+@font-face {
+    font-family: 'InfinitySans-RegularA1';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/InfinitySans-RegularA1.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.widget-title, .link-widget, .memb_out_b, .title, .bye, .info, .content-title, #btn-delete, h1, h2, h3, h4, h5, p, span, button {
+	font-family: 'InfinitySans-RegularA1'!important;
+}
+
+.bye {
+	border: 1px solid black;
+	padding: 20px 0px 0px 0px;
+	margin-bottom: 15px;
+}
+
+strong {
+	display: inline-block;
+	width: 100px;
+}
+
+label:hover {
+	cursor: pointer;
+}
+
+.title-one {
+	border-bottom: 2px solid black;
+	padding-bottom: 30px;
+}
+
+em {
+	color: #ea582a;
+}
+
+#btn-delete {float: right;}
+
+#btn-delete, #btn-back, #btn-update, #btn-insert {
+	background: #f8e9e2;
+	color: #464646;
+}
+	
+#btn-delete:hover, #btn-back:hover, #btn-update:hover, #btn-insert:hover {
+	background: #f8c7b8;
+	color: #5e5e5e;
+	cursor: pointer;
+}
+
+.widget-sidebar {
+	width: 200px;
+}
+
+.link-widget  ul li {
+	padding: 10px;
+	text-align: left;
+}
+
+.link-widget  ul li:hover {
+	background: #f8e9e2;
+	cursor: pointer;
+}
+
+.link-widget ul li a span{
+	padding-right: 10px;
+}
+
+.active-sidebar {
+	background: #f8e9e2;
+}
+
+.content {
+		font-family: 'InfinitySans-RegularA1';
+		display: inline-block;
+	}
+	
+#result, #userupdate {
+    font-family: 'InfinitySans-RegularA1';
+	line-height: 1.5;
+}
+    
+#result tr { display: block; float: left;}
+#result th { width: 150px; padding: 10px; display: block; border: 1px solid #ccc; text-align: center; background: #f8e9e2;}
+#result td { width: 250px; padding: 10px; display: block; border: 1px solid #ccc; }
+

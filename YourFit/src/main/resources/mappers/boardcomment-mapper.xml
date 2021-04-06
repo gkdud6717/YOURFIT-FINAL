@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="boardcommentMapper">
+
+<!-- property 는 member의 변수이름 cloumn은 데이터베이스 컬럼이름(대소문자 상관x) -->
+	<resultMap type="boardcomment" id="boardcommentMap">
+
+	</resultMap>
+	
+	
+	
+</mapper>

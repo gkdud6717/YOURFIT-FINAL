@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="index">
+
+<resultMap type="notice" id="notice"></resultMap>
+ <resultMap type="Product" id="resultProduct">
+		<id property="p_No" column="p_No"/>
+		<result property="p_Name" column="p_Name"/>
+		<result property="p_Type" column="p_Type"/>
+		<result property="p_Count" column="p_COUNT" />
+		<result property="p_Content" column="p_Content" />
+		<result property="p_Quantity" column="p_Quantity" />
+		<result property="p_Price" column="p_Price" />
+		<collection property="files" ofType="productimg">
+			<id property="i_No" column="i_No"/>
+			<result property="i_ChangeName" column="I_CHANGENAME" />
+			<result property="i_UploadDate" column="I_UPLOADDATE" />
+		</collection>
+</resultMap>
+
+<resultMap type="AdBoard" id="resultAdBoard">
+		<id property="ad_No" column="ad_No"/>
+		<result property="ad_Title" column="ad_Title"/>
+		<result property="ad_Content" column="AD_CONTENT"/>
+		<result property="ad_Count" column="AD_COUNT" />
+		<result property="status" column="STATUS" />
+		<result property="ad_Mno" column="AD_MNO" />
+		<result property="ad_Date" column="AD_DATE"/>
+		<result property="nick" column="M_NICK"/>
+		<collection property="files" ofType="boardfile">
+			<id property="f_No" column="f_No"/>
+			<result property="f_Cname" column="F_CNAME" />
+			<result property="f_UploadDate" column="F_UPLOADDATE" />
+		</collection>
+	</resultMap>
+
+
+   <select id="selectNoticeList" resultMap="notice">
+		SELECT N_NO, N_TITLE, N_COUNT, N_DATE
+		FROM NOTICE
+		WHERE ROWNUM &lt; 7
+		ORDER BY N_DATE DESC, N_NO DESC
+	</select>
+
+   <select id="selectNoticeTotalContents" resultType="_int"> 
+		SELECT COUNT(*) FROM NOTICE
+	</select>
+
+
+   <select id="noticeUpdateView" resultType="notice">
+		SELECT * FROM NOTICE WHERE N_NO = #{n_no} 
+	</select>
+
+    <select id="selectMemberList" resultType="member">
+      SELECT M_NO, M_NICK, COUNT
+      FROM (SELECT M.M_NO, COUNT(C.CO_NO) AS "COUNT", M_NICK
+      FROM MEMBER M
+      INNER JOIN CO_BOARD C ON M.M_NO = C.CO_MNO
+      GROUP BY M.M_NO, M_NICK
+      ORDER BY "COUNT" DESC)
+      WHERE ROWNUM &lt; 6
+   </select>
+   
+   <select id="selectDTList" resultType="DtBoard">
+      SELECT * FROM DT_BOARD
+      WHERE ROWNUM &lt; 8
+      ORDER BY DT_COUNT DESC
+   </select>
+   
+   <select id="selectHTList" resultType="htboard">
+      SELECT HT_NO, HT_TYPE, HT_TITLE, HT_COUNT 
+      FROM HT_BOARD
+      WHERE ROWNUM &lt; 8
+      ORDER BY HT_COUNT DESC
+   </select>
+   
+  
+	<select id="selectProductList" resultMap="resultProduct">
+	  SELECT *
+      FROM (SELECT * FROM PRODUCT
+      JOIN PRODUCT_IMG ON(PRODUCT.P_NO = PRODUCT_IMG.I_PNO)
+      ORDER BY P_COUNT DESC, PRODUCT_IMG.I_CHANGENAME ASC)
+      WHERE ROWNUM &lt; 13
+      
+	</select>
+	
+	<select id="selectadBoardList" resultMap="resultAdBoard">
+		SELECT TO_NUMBER(SUBSTR(AD_NO, 3)) AS AD_INDEX, AD.*, BOARD_FILE.*
+		FROM AD
+		JOIN BOARD_FILE ON(AD.AD_NO = BOARD_FILE.F_ADNO)
+		WHERE STATUS = 'Y'
+		ORDER BY AD_INDEX DESC
+	</select>
+   
+  
+</mapper>

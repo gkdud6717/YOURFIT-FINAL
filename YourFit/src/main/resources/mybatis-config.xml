@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC
+"-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<!-- 마이바티스 DB연결 시 설정할 내용을 작성 -->
+		<setting name="jdbcTypeForNull" value="NULL"/>
+	</settings>
+
+	<typeAliases>
+		<typeAlias type="com.kh.yourfit.adBoard.model.vo.AdBoard" alias="adboard" />
+		<typeAlias type="com.kh.yourfit.co_board.model.vo.co_board" alias="coboard" />
+		<typeAlias type="com.kh.yourfit.member.model.vo.Member" alias="member" />
+		<typeAlias type="com.kh.yourfit.board_file.model.vo.board_file" alias="boardfile" />
+		<typeAlias type="com.kh.yourfit.board_comment.model.vo.board_comment" alias="boardcomment" />
+		<typeAlias alias="Member" type="com.kh.yourfit.member.model.vo.Member"/>
+		<typeAlias alias="cbBoard" type="com.kh.yourfit.cbBoard.model.vo.cbBoard"/>
+		<typeAlias type="com.kh.yourfit.dtboard.model.vo.DtBoard" alias="DtBoard"/>
+		<typeAlias alias="htboard" type="com.kh.yourfit.ht_board.model.vo.ht_board"/>
+		<typeAlias type="com.kh.yourfit.notice.model.vo.Notice" alias="notice"/>
+		<typeAlias type="com.kh.yourfit.mypage.model.vo.dateJoin" alias="dateJoin"/>
+		<typeAlias alias="event" type="com.kh.yourfit.event.model.vo.event"/>
+		<typeAlias type="com.kh.yourfit.product.model.vo.Product" alias="product" />
+		<typeAlias type="com.kh.yourfit.product_img.model.vo.product_img" alias="productimg" />
+		<typeAlias type="com.kh.yourfit.mypage.model.vo.boardCount" alias="boardCount"/>
+		<typeAlias alias="ProductReview" type="com.kh.yourfit.product_Review.model.vo.ProductReview"/>
+		<typeAlias alias="Question" type="com.kh.yourfit.question.model.vo.Question"/>
+		<typeAlias alias="cart" type="com.kh.yourfit.cart.model.vo.Cart"/>
+		<typeAlias alias="Orders" type="com.kh.yourfit.orders.model.vo.Orders"/>
+		<typeAlias alias="sale" type="com.kh.yourfit.mypage.model.vo.sale"/>
+	</typeAliases>
+
+	<typeHandlers>
+	</typeHandlers>
+</configuration>

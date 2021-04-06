@@ -1,0 +1,123 @@
+@charset "UTF-8";
+
+@font-face {
+    font-family: 'InfinitySans-RegularA1';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/InfinitySans-RegularA1.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    }
+   
+	.content {
+		font-family: 'InfinitySans-RegularA1';
+		display: inline-block;
+	}
+	.keyword, h2, h3, h4, h5, input, textarea { font-family: 'InfinitySans-RegularA1'!important; }
+	
+	.keyword {
+		padding: 12px 0px 12px 10px;
+	}
+	
+	.h3tag {
+		font-weight: 500;
+	}
+	
+	.add-cal {
+		font-family: 'InfinitySans-RegularA1';
+	    display: inline-block;
+		float: right;
+	}
+	
+	#btn-add, #btn-update, #btn-back {
+		font-family: 'InfinitySans-RegularA1';
+		background: #f8e9e2;
+		color: #464646;
+	}
+	
+	#btn-add:hover, #btn-update:hover, #btn-back:hover {
+		background: #c04545;
+		color: #5e5e5e!important;
+		cursor: pointer;
+	}
+	
+	.sch-div {
+		font-family: 'InfinitySans-RegularA1';
+   		border: 1px solid black;
+   		padding: 20px;
+   		margin-bottom: 20px;
+    }
+    
+    .span-color {
+    	font-family: 'InfinitySans-RegularA1';
+    	color: red;
+    }
+    
+    .table {
+    	font-family: 'InfinitySans-RegularA1';
+    	text-align: center;
+    }
+    
+    .table tr th {
+    	text-align: center;
+    }
+    
+    .p-info {
+    	font-family: 'InfinitySans-RegularA1';
+    	padding: 10px 10px 0px 0px;
+    	margin-bottom: 0;
+    	float:left;
+    }
+    
+    .fa-search {
+    	background: #f8e9e2;
+    	padding: 17px;
+    	border: 1px solid #f8c7b8;
+    	border-radius: 10%;
+    	
+    }
+    
+    .fa-search:hover {
+    	background: #f8c7b8;
+    	cursor: pointer;
+    }
+    
+    #wrap-contents {
+    	background-color: #ffffff;
+        border-top: 1px dashed #dadada;
+        padding: 1rem 0;
+        
+    }
+    
+    #result {
+    	font-family: 'InfinitySans-RegularA1';
+		line-height: 1.5;
+	}
+    
+    #result tr { display: block; float: left;}
+	#result th { width: 150px; padding: 10px; display: block; border: 1px solid #ccc; text-align: center; background: #f8e9e2;}
+	#result td { width: 250px; padding: 10px; display: block; border: 1px solid #ccc; }
+	
+	#nutrient {
+		font-family: 'InfinitySans-RegularA1';
+		text-align: center;
+	}
+	
+	#nutrient th {width: 130px; padding: 10px; border: 1px solid #ccc; text-align: center; background: #f8e9e2;}
+	#nutrient td {width: 130px; padding: 10px; border: 1px solid #ccc;}
+	
+	#icon {color:black !important; background-color: white; font-size: 40px; margin-right: 10px;}
+	
+	#slide-right {
+   overflow: hidden;
+}
+
+#slide-right h2 {
+   animation: 1s slide-right;
+}
+@keyframes slide-right {
+    from {
+       margin-left: -250px;
+    }
+    to {
+       margin-left: 0%;
+    }
+ }

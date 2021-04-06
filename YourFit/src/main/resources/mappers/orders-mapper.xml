@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OrdersMapper">
+
+<!-- property 는 member의 변수이름 cloumn은 데이터베이스 컬럼이름(대소문자 상관x) -->
+	<resultMap type="Orders" id="OrdersMap">
+
+	</resultMap>
+	
+	<insert id="ordersinsert" parameterType="Orders">
+		INSERT INTO ORDERS (O_NO, O_PNO, O_DATE, O_AMOUNT, O_PAYMETHOD, O_PAYAMOUNT, O_PAYSTATUS, O_MNO) 
+   			 VALUES (ORDERS_SEQ.NEXTVAL, #{o_Pno}, SYSDATE , #{o_Amount} ,#{o_Paymethod} , #{o_Payamount}, #{o_Paystatus}, #{o_Mno} )
+		
+	</insert>
+	
+	
+</mapper>

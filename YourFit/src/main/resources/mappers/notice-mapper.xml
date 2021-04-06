@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="noticeMapper">
+
+    
+
+    <select id="selectNoticeList" resultType="notice">
+       SELECT N_NO, N_TITLE, N_MNO, N_COUNT, N_DATE, MEMBER.M_NAME
+       FROM NOTICE, MEMBER
+       WHERE NOTICE.N_MNO = MEMBER.M_NO
+       ORDER BY N_DATE DESC, N_NO DESC  
+    </select>
+    
+    <select id="selectNoticeTotalContents" resultType="_int">
+       SELECT COUNT(*) FROM NOTICE
+    </select>
+    
+    <select id="selectOneNotice" parameterType="_int" resultType="notice">
+        SELECT NOTICE.*, MEMBER.M_NICK 
+		FROM NOTICE 
+		JOIN MEMBER ON(NOTICE.N_MNO = MEMBER.M_NO)
+		WHERE N_NO = #{n_no} 
+    </select>
+    
+   <insert id="insertNotice" parameterType="notice" > 
+		INSERT INTO NOTICE (N_NO, N_MNO, N_TITLE, N_CONTENT, N_COUNT, N_DATE)
+        VALUES (NOTICE_SEQ.NEXTVAL, #{n_mno}, #{n_title}, #{n_content}, 0, SYSDATE) 
+	</insert>
+	
+	<update id="updateReadCount" parameterType="_int">
+		UPDATE NOTICE
+		SET N_COUNT = N_COUNT + 1
+		WHERE N_NO = #{n_no}
+	</update>
+    
+    <update id="noticeUpdate" parameterType="notice">
+        UPDATE NOTICE
+        SET N_TITLE = #{n_title},
+            N_CONTENT = #{n_content}
+        WHERE N_NO = #{n_no}
+    </update>
+    
+    <select id="noticeUpdateView" resultType="notice">
+		SELECT * FROM NOTICE WHERE N_NO = #{n_no}
+	</select>
+    
+    <delete id="noticeDelete" parameterType="notice">
+        DELETE FROM NOTICE WHERE N_NO = #{n_no}
+    </delete>
+    
+    <select id="noticeSearch" resultType="notice" parameterType="hashMap">
+		SELECT N.*, 
+		     (SELECT M_NICK FROM MEMBER WHERE M_NO = N.N_MNO) NICK
+		FROM NOTICE N 
+		<if test='searchType.equals("title")'> WHERE N_TITLE LIKE '%' || #{keyword} || '%'</if>
+
+		<if test='searchType.equals("content")'> WHERE N_CONTENT LIKE '%' || #{keyword} || '%' </if>
+		
+		<if test='searchType.equals("title_content")'> WHERE N_TITLE LIKE '%' || #{keyword} || '%' OR N_CONTENT LIKE '%' || #{keyword} || '%' </if>
+		ORDER BY N_DATE DESC 
+	</select>
+
+	<select id="noticeSearchCount" resultType="_int" parameterType="String">
+		SELECT COUNT(*) FROM NOTICE WHERE N_TITLE LIKE '%' || #{keyword} || '%' 
+	</select>
+    
+
+
+</mapper>

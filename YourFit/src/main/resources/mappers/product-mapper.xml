@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="productMapper">
+	<resultMap type="Product" id="resultProduct">
+		<id property="p_No" column="p_No"/>
+		<result property="p_Name" column="p_Name"/>
+		<result property="p_Type" column="p_Type"/>
+		<result property="p_Count" column="p_COUNT" />
+		<result property="p_Content" column="p_Content" />
+		<result property="p_Quantity" column="p_Quantity" />
+		<result property="p_Price" column="p_Price" />
+		<collection property="files" ofType="productimg">
+			<id property="i_No" column="i_No"/>
+			<result property="i_ChangeName" column="I_CHANGENAME" />
+			<result property="i_UploadDate" column="I_UPLOADDATE" />
+		</collection>
+		<!--  <collection property="comment" ofType="boardcomment">
+			<id property="bc_Content" column="bc_Content"/>
+			<id property="bc_Date" column="bc_Date" />
+			<id property="bc_Mno" column="bc_Mno" /> 
+		</collection>  -->
+	</resultMap>
+	
+	<select id="selectProductList" resultMap="resultProduct">
+		SELECT *
+		FROM PRODUCT
+		JOIN PRODUCT_IMG ON(PRODUCT.P_NO = PRODUCT_IMG.I_PNO)
+		ORDER BY P_NO DESC, PRODUCT_IMG.I_CHANGENAME ASC
+	</select>
+	
+	<select id="selectProductListLiv" resultMap="resultProduct">
+		SELECT *
+		FROM PRODUCT
+		JOIN PRODUCT_IMG ON(PRODUCT.P_NO = PRODUCT_IMG.I_PNO)
+		WHERE PRODUCT.P_TYPE = 'Living'
+		ORDER BY P_NO DESC, PRODUCT_IMG.I_CHANGENAME ASC
+	</select>
+	
+	<select id="selectProductListFh" resultMap="resultProduct">
+		SELECT *
+		FROM PRODUCT
+		JOIN PRODUCT_IMG ON(PRODUCT.P_NO = PRODUCT_IMG.I_PNO)
+		WHERE PRODUCT.P_TYPE = 'Food/Health'
+		ORDER BY P_NO DESC, PRODUCT_IMG.I_CHANGENAME ASC
+	</select>
+	
+	<select id="selectProductListBea" resultMap="resultProduct">
+		SELECT *
+		FROM PRODUCT
+		JOIN PRODUCT_IMG ON(PRODUCT.P_NO = PRODUCT_IMG.I_PNO)
+		WHERE PRODUCT.P_TYPE = 'Beauty'
+		ORDER BY P_NO DESC, PRODUCT_IMG.I_CHANGENAME ASC
+	</select>
+	
+	<select id="selectProductTotalContents" resultType="_int">
+		SELECT COUNT(*) FROM PRODUCT
+	</select>
+	
+	<insert id="insertProduct" parameterType="product">
+		INSERT INTO PRODUCT (P_NO, P_NAME, P_TYPE, P_PRICE, P_CONTENT, P_QUANTITY,  P_COUNT)
+		VALUES(PRODUCT_SEQ.NEXTVAL, #{p_Name}, #{p_Type}, #{p_Price}, #{p_Content},#{p_Quantity}, 0)
+	</insert>
+	
+	<insert id="insertProductImg" parameterType="productimg">
+		
+		<selectKey keyProperty="p_No" resultType="_int" order="BEFORE">
+			SELECT PRODUCT_SEQ.CURRVAL FROM DUAL
+		</selectKey>
+		
+		INSERT INTO PRODUCT_IMG(I_NO, I_PNO, I_ORIGINNAME, I_CHANGENAME, I_UPLOADDATE)
+		VALUES(PRODUCT_IMG_SEQ.NEXTVAL, #{p_No}, #{i_OriginName}, #{i_ChangeName}, SYSDATE)
+	</insert>
+	
+	<select id="selectOneProduct" parameterType="_int" resultMap="resultProduct">
+		SELECT *
+		FROM PRODUCT
+		JOIN PRODUCT_IMG ON(PRODUCT.P_NO = PRODUCT_IMG.I_PNO)
+		WHERE PRODUCT.P_NO = #{p_No}
+	</select>
+	
+	<select id="selectProductImgList" resultType="productimg">
+		SELECT * FROM PRODUCT_IMG WHERE I_PNO = #{i_Pno}
+	</select>
+
+	<update id="updateReadCount" parameterType="_int">
+		UPDATE PRODUCT
+		SET P_COUNT = P_COUNT + 1
+		WHERE P_NO = #{p_No}
+	</update>
+	
+	<update id="updateProduct" parameterType="product">
+			UPDATE PRODUCT
+			SET P_NAME = #{p_Name},
+				P_TYPE = #{p_Type},
+			    P_PRICE = #{p_Price},
+			    P_CONTENT = #{p_Content}
+		    WHERE P_NO = #{p_No}
+	</update>
+	
+	<insert id="updateProductImg" parameterType="productimg">
+		INSERT INTO PRODUCT_IMG(I_NO, I_PNO, I_ORIGINNAME, I_CHANGENAME, I_UPLOADDATE) VALUES
+		(PRODUCT_IMG_SEQ.NEXTVAL, #{i_Pno}, #{i_OriginName}, #{i_ChangeName}, SYSDATE )
+	</insert>
+	
+	<delete id="deleteProductImg" parameterType="_int">
+		DELETE FROM PRODUCT_IMG
+		WHERE I_PNO = #{p_No}
+	</delete>
+	
+	<delete id="deleteProduct" parameterType="_int">
+		DELETE FROM PRODUCT
+		WHERE P_NO = #{p_No}
+	</delete>
+	
+	<insert id="insertReview" parameterType="ProductReview">INSERT INTO PRODUCT_REVIEW (R_NO, R_CONTENT, R_DATE, R_PNO, R_MNO) VALUES(PRODUCT_REVIEW_SEQ.NEXTVAL , #{r_Content} , SYSDATE, #{r_Pno} , #{r_Mno}) </insert>
+
+<select id="selectReviewlist" resultType="ProductReview" parameterType="_int">SELECT PR.*,(SELECT M_NICK FROM MEMBER WHERE M_NO = PR.R_MNO) R_NICK FROM PRODUCT_REVIEW PR WHERE R_PNO = #{p_No} ORDER BY R_DATE DESC </select>
+
+<delete id="deleteReview" parameterType="_int">DELETE FROM PRODUCT_REVIEW WHERE R_NO = #{r_No} </delete>
+
+<update id="updateReview" parameterType="ProductReview">UPDATE PRODUCT_REVIEW SET R_CONTENT = #{r_Content} WHERE R_NO = #{r_No} </update>
+
+<insert id="insertQuestion" parameterType="Question">INSERT INTO QUESTION(Q_NO, Q_TITLE, Q_CONTENT, Q_DATE, Q_PNO, Q_MNO) VALUES(QUESTION_SEQ.NEXTVAL, #{q_Title} , #{q_Content} , SYSDATE, #{q_Pno} , #{q_Mno}) </insert>
+
+<select id="selectQuestionlist" resultType="Question" parameterType="_int">SELECT Q.*,(SELECT M_NICK FROM MEMBER WHERE M_NO = Q.Q_MNO) Q_NICK FROM QUESTION Q WHERE Q_PNO = #{q_Pno} ORDER BY Q_DATE DESC </select>
+	
+	
+	<select id="productSearch" parameterType="hashMap" resultMap="resultProduct">
+		SELECT *
+		FROM PRODUCT
+		JOIN PRODUCT_IMG ON(PRODUCT.P_NO = PRODUCT_IMG.I_PNO)
+		
+		<if test='searchType.equals("title")'>
+		WHERE P_NAME LIKE CONCAT(CONCAT('%', #{keyword}), '%')
+		</if>
+		
+		<if test='searchType.equals("content")'>
+		WHERE P_CONTENT LIKE CONCAT(CONCAT('%', #{keyword}), '%')
+		</if>
+		
+		<if test='searchType.equals("title_content")'>
+		WHERE P_NAME LIKE CONCAT(CONCAT('%', #{keyword}), '%')
+		OR  P_CONTENT LIKE CONCAT(CONCAT('%', #{keyword}), '%')
+		</if>
+		ORDER BY P_NO DESC, PRODUCT_IMG.I_CHANGENAME ASC
+	</select>
+	
+	<select id="productSearchCount" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM PRODUCT
+		WHERE P_NAME LIKE '%' || #{keyword} || '%'
+	</select>
+	<!--  
+	<select id="selectBoardListCal" resultMap="resultDtBoard">
+		SELECT *
+		FROM DT_BOARD
+		JOIN BOARD_FILE ON(DT_BOARD.DT_NO = BOARD_FILE.F_DTNO)
+		JOIN MEMBER ON(DT_MNO = MEMBER.M_NO)
+		WHERE DT_BOARD.STATUS = 'Y' AND DT_BOARD.DT_TYPE = '칼럼'
+		ORDER BY DT_NO DESC 
+	</select>
+	
+	<select id="selectBoardListExe" resultMap="resultDtBoard">
+		SELECT *
+		FROM DT_BOARD
+		JOIN BOARD_FILE ON(DT_BOARD.DT_NO = BOARD_FILE.F_DTNO)
+		JOIN MEMBER ON(DT_MNO = MEMBER.M_NO)
+		WHERE DT_BOARD.STATUS = 'Y' AND DT_BOARD.DT_TYPE = '운동'
+		ORDER BY DT_NO DESC 
+	</select>
+	
+	<select id="selectBoardListDiet" resultMap="resultDtBoard">
+		SELECT *
+		FROM DT_BOARD
+		JOIN BOARD_FILE ON(DT_BOARD.DT_NO = BOARD_FILE.F_DTNO)
+		JOIN MEMBER ON(DT_MNO = MEMBER.M_NO)
+		WHERE DT_BOARD.STATUS = 'Y' AND DT_BOARD.DT_TYPE = '식단'
+		ORDER BY DT_NO DESC 
+	</select>
+	
+	<select id="selectBoardTotalContents" resultType="_int">
+		SELECT COUNT(*) FROM DT_BOARD
+	</select>
+
+	<insert id="insertBoard" parameterType="DtBoard">
+		INSERT INTO DT_BOARD (DT_NO, DT_TYPE, DT_TITLE, DT_CONTENT, DT_COUNT, DT_MNO, STATUS)
+		VALUES('DT'||DT_BOARD_SEQ.NEXTVAL, #{dt_Type}, #{dt_Title}, #{dt_Content}, 0, #{dt_Mno}, 'Y')
+	</insert>
+	
+	<insert id="insertBoardFile" parameterType="boardfile">
+		
+		<selectKey keyProperty="dt_No" resultType="string" order="BEFORE">
+			SELECT DT_BOARD_SEQ.CURRVAL FROM DUAL
+		</selectKey>
+		
+		INSERT INTO BOARD_FILE(F_NO, F_DTNO, F_TYPE, F_NAME, F_CNAME, F_UPLOADDATE)
+		VALUES(BOARD_FILE_SEQ.NEXTVAL, 'DT'||#{dt_No}, '1', #{f_Name}, #{f_Cname}, SYSDATE)
+	</insert>
+	
+	<select id="selectOneBoard" parameterType="string" resultType="DtBoard">
+		SELECT DT.*, 
+        (SELECT M_NICK FROM MEMBER WHERE M_NO = DT.DT_MNO) NICK,
+        (SELECT F_CNAME FROM BOARD_FILE WHERE F_DTNO = DT.DT_NO) NO,
+        (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_DTNO = DT.DT_NO) COMMENTCOUNT
+		FROM DT_BOARD DT
+        WHERE DT_NO = #{dt_No}
+        
+	</select>
+	
+	<select id="selectBoardFileList" resultType="boardfile">
+		SELECT * FROM BOARD_FILE WHERE F_DTNO = #{f_Dtno}
+	</select>
+
+	<update id="updateReadCount" parameterType="string">
+		UPDATE DT_BOARD
+		SET DT_COUNT = DT_COUNT + 1
+		WHERE DT_NO = #{dt_No}
+	</update>
+	
+	<update id="updateBoard" parameterType="DtBoard">
+		UPDATE DT_BOARD
+		SET DT_TITLE = #{dt_Title},
+		    DT_CONTENT = #{dt_Content}
+		WHERE DT_NO = #{dt_No}
+	</update>
+	
+	<insert id="updateBoardFile" parameterType="boardfile">
+		INSERT INTO BOARD_FILE(F_NO, F_DTNO, F_TYPE, F_NAME, F_CNAME, F_UPLOADDATE) VALUES
+		(BOARD_FILE_SEQ.NEXTVAL, #{f_Dtno}, '1', #{f_Name}, #{f_Cname},
+		 SYSDATE )
+	</insert>
+	
+	<delete id="deleteBoardFile" parameterType="string">
+		DELETE FROM Board_File
+		WHERE F_DTNO = #{dt_No}
+	</delete>
+	
+	<delete id="deleteBoard" parameterType="string">
+		UPDATE DT_BOARD
+		SET  STATUS = 'N'
+		WHERE DT_NO = #{dt_No}
+	</delete>
+	
+	<delete id="deleteFile" parameterType="_int">
+		DELETE FROM Board_File
+		WHERE F_NO = #{fNo}
+	</delete>
+	
+	<insert id="insertboardComment" parameterType="boardcomment">
+		INSERT INTO BOARD_COMMENT(BC_NO, BC_CONTENT, BC_DATE, BC_TYPE, BC_DTNO, BC_MNO) 
+		VALUES (BOARD_COMMENT_SEQ.NEXTVAL, #{bc_Content}, SYSDATE, 1, #{bc_Dtno}, #{bc_Mno})
+	</insert>	
+	
+	 <select id="selectBoardComment" parameterType="string" resultType="boardcomment">
+		SELECT BC.*, 
+        (SELECT M_NICK FROM MEMBER WHERE M_NO = BC.BC_MNO) NICK,
+        (SELECT DT_NO FROM DT_BOARD WHERE DT_NO = BC.BC_DTNO) NO
+		FROM BOARD_COMMENT BC
+        WHERE BC_DTNO = #{bc_Dtno}
+	</select>
+	
+	<update id="updateBoardComment" parameterType="boardcomment">
+		UPDATE BOARD_COMMENT
+		SET BC_CONTENT = #{bc_Content}
+		WHERE BC_NO = #{bc_No} 		
+	</update>
+	
+	<delete id="deleteBoardComment" parameterType="_int">
+		DELETE FROM BOARD_COMMENT
+		WHERE BC_NO = #{bc_No} 
+	</delete>
+	
+	<select id="dtBoardSearch" parameterType="hashMap" resultType="DtBoard">
+		SELECT *
+		FROM DT_BOARD
+		
+		<if test='searchType.equals("title")'>
+		WHERE DT_TITLE LIKE CONCAT(CONCAT('%', #{keyword}), '%')
+		</if>
+		
+		<if test='searchType.equals("content")'>
+		WHERE DT_CONTENT LIKE CONCAT(CONCAT('%', #{keyword}), '%')
+		</if>
+		
+		<if test='searchType.equals("title_content")'>
+		WHERE DT_TITLE LIKE CONCAT(CONCAT('%', #{keyword}), '%')
+		OR  DT_CONTENT LIKE CONCAT(CONCAT('%', #{keyword}), '%')
+		</if>
+		AND STATUS = 'Y'
+		ORDER BY DT_NO DESC
+	</select>
+	
+	
+	<select id="dtBoardSearchCount" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM DT_BOARD
+		WHERE DT_TITLE LIKE '%' || #{keyword} || '%'
+	</select>
+	-->
+</mapper>
+
+
+
+
+
+
+
+
+
+

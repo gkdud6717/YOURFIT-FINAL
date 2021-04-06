@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="coboardMapper">
+
+<!-- property 는 member의 변수이름 cloumn은 데이터베이스 컬럼이름(대소문자 상관x) -->
+	<resultMap type="coboard" id="coboardMap">
+	<!-- 	 <id property="co_No" column="co_no"/>
+		<result property="co_Type" column="co_type"/>
+		<result property="co_Title" column="co_title"/>
+		<result property="co_Content" column="co_content"/>
+		<result property="co_Date" column="co_date"/>
+		<result property="co_Count" column="co_count"/>
+		<result property="co_Status" column="co_status"/>
+		<result property="co_Mno" column="co_mno"/> -->
+		<collection property="files" ofType="boardfile" >
+			<id property="f_No" column="f_No" />
+	 		<result property="f_Cname" column="f_Cname" />
+	 		<result property="f_Cono" column="f_Cono" />
+		</collection>
+	</resultMap>
+
+
+	<select id="selectcoBoardList" resultType="coboard">
+		SELECT C.*, 
+			(SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK, (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_CONO = C.CO_NO) COMMENTCOUNT
+		FROM CO_BOARD C
+        WHERE CO_STATUS = 'Y'
+        ORDER BY CO_DATE DESC
+	</select>
+
+	<select id="selectcoBoardListFood" resultType="coboard">
+		SELECT C.*, 
+			(SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK
+		FROM CO_BOARD C
+        WHERE CO_STATUS = 'Y' AND CO_TYPE='식단'
+        ORDER BY CO_DATE DESC
+	</select>
+
+	<select id="selectBoardTotalContents" resultType="_int">
+		SELECT COUNT(*) FROM CO_BOARD
+	</select>
+	
+	
+	<insert id="insertBoard" parameterType ="coboard">
+		INSERT INTO CO_BOARD
+		VALUES ('CO' ||CO_BOARD_SEQ.NEXTVAL, #{co_Type}, #{co_Title}, #{co_Content}, SYSDATE, 0 , 'Y', #{co_Mno})  <!-- 회원번호 받는거로 추후 세션 구현 후 수정하야함 -->
+	</insert>
+	
+	
+
+	<insert id="insertAttachment" parameterType="boardfile">
+		<selectKey keyProperty="co_No" resultType="string" order="BEFORE">
+			SELECT CO_BOARD_SEQ.CURRVAL FROM DUAL
+		</selectKey>
+	
+		INSERT INTO BOARD_FILE(F_NO, F_CONO, F_TYPE, F_NAME, F_CNAME, F_UPLOADDATE)
+		VALUES (BOARD_FILE_SEQ.NEXTVAL, 'CO'||#{co_No}, '1', #{f_Name}, #{f_Cname}, SYSDATE)
+	</insert> 
+	
+	
+	<select id="selectOneBoard" parameterType="string" resultType="coboard">
+		SELECT C.*, (SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK  FROM CO_BOARD C WHERE CO_NO = #{co_No} 
+<!-- 	SELECT C.*, (SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK, (SELECT F_CNAME FROM BOARD_FILE WHERE F_CONO=#{co_No}) FILES  FROM CO_BOARD C WHERE CO_NO = #{co_No}; -->
+	</select>
+	
+	
+
+	<update id="updateReadCount" parameterType="string">
+		UPDATE CO_BOARD
+		SET CO_COUNT = CO_COUNT + 1
+		WHERE CO_NO = #{co_No}
+	</update>
+	
+	
+	<select id="selectFileList" parameterType="string" resultType="boardfile">
+		SELECT * FROM BOARD_FILE WHERE F_CONO = #{co_No}
+	</select>
+	
+	<delete id="deleteFile" parameterType="_int">
+		DELETE FROM BOARD_FILE
+		WHERE F_NO = #{f_No}
+	</delete>
+	
+	
+	<delete id="deleteAttachment" parameterType="string">
+		DELETE FROM BOARD_FILE
+		WHERE CO_NO = #{co_No}
+	</delete>
+	
+	<insert id="updateAttachment" parameterType="boardfile">
+	INSERT INTO BOARD_FILE(F_NO, F_CONO, F_TYPE, F_NAME, F_CNAME, F_UPLOADDATE)  VALUES
+	 (BOARD_FILE_SEQ.NEXTVAL, #{co_No}, 1, #{f_Name}, #{f_Cname}, SYSDATE)
+	</insert>
+	
+
+	<update id="updateBoard" parameterType="coboard">
+		UPDATE CO_BOARD
+		SET CO_TITLE = #{co_Title},
+		    CO_CONTENT = #{co_Content}
+		WHERE CO_NO = #{co_No}
+	</update>
+	
+	<delete id="deleteBoard" parameterType="string">
+		DELETE FROM CO_BOARD
+		WHERE CO_NO = #{co_No}
+	</delete>
+	
+	<insert id="insertboardComment" parameterType="boardcomment">
+		INSERT INTO BOARD_COMMENT(BC_NO, BC_CONTENT, BC_DATE, BC_TYPE, BC_CONO, BC_MNO) VALUES (BOARD_COMMENT_SEQ.NEXTVAL, #{bc_Content}, SYSDATE, 1, #{bc_Cono}, #{bc_Mno})
+	</insert>
+	
+	<select id="selectBoardComment" parameterType="string" resultType="boardcomment">
+		<!-- SELECT * FROM BOARD_COMMENT WHERE BC_CONO = #{co_No} -->
+		SELECT BC.*,(SELECT M_NICK FROM MEMBER WHERE M_NO = BC.BC_MNO) NICK FROM BOARD_COMMENT BC WHERE BC_CONO = #{co_No}
+	</select>
+	
+	<delete id="deleteBoardComment" parameterType="_int">
+		DELETE FROM BOARD_COMMENT WHERE BC_NO = #{bc_no}
+	</delete>
+	
+	<update id="updateBoardComment" parameterType="boardcomment">
+		UPDATE BOARD_COMMENT SET BC_CONTENT = #{bc_Content} WHERE BC_NO = #{bc_No}
+	</update>
+	
+	<select id="coboardSearch" resultType="coboard" parameterType="hashMap">
+		SELECT C.*, 
+			(SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK, (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_CONO = C.CO_NO) COMMENTCOUNT
+		FROM CO_BOARD C
+		<if test='searchType.equals("title")'> WHERE CO_TITLE LIKE CONCAT(CONCAT('%', #{keyword}), '%') </if>
+
+		<if test='searchType.equals("content")'> WHERE CO_CONTENT LIKE CONCAT(CONCAT('%', #{keyword}), '%') </if>
+		
+		<if test='searchType.equals("title_content")'> WHERE CO_TITLE LIKE CONCAT(CONCAT('%', #{keyword}), '%')OR CO_CONTENT LIKE CONCAT(CONCAT('%', #{keyword}), '%') </if>
+		AND CO_STATUS = 'Y' ORDER BY CO_DATE DESC 
+	</select>
+
+	<select id="coboardSearchCount" resultType="int" parameterType="String">
+		SELECT COUNT(*) FROM CO_BOARD WHERE CO_TITLE LIKE '%' || #{keyword} || '%' 
+	</select>
+	
+	
+	<!-- ㅇㅇㅇㅇㅇㅇㅇㅇ- -->
+	
+	<select id="selectBoardListDiet" resultType="coboard">
+		SELECT C.*, 
+			(SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK, (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_CONO = C.CO_NO) COMMENTCOUNT
+		FROM CO_BOARD C
+        WHERE CO_STATUS = 'Y' AND CO_TYPE='식단'
+        ORDER BY CO_DATE DESC
+	</select>
+	
+	
+	<select id="selectcoBoardTotalContentsDiet" resultType="_int">
+		SELECT COUNT(*) FROM CO_BOARD WHERE CO_TYPE='식단'
+	</select>
+	
+	<select id="selectBoardListExer" resultType="coboard">
+		SELECT C.*, 
+			(SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK, (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_CONO = C.CO_NO) COMMENTCOUNT
+		FROM CO_BOARD C
+        WHERE CO_STATUS = 'Y' AND CO_TYPE='운동'
+        ORDER BY CO_DATE DESC
+	</select>
+	
+	<select id="selectcoBoardTotalContentsExer" resultType="_int">
+		SELECT COUNT(*) FROM CO_BOARD WHERE CO_TYPE='운동'
+	</select>
+	
+	<select id="selectBoardListTip" resultType="coboard">
+		SELECT C.*, 
+			(SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK, (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_CONO = C.CO_NO) COMMENTCOUNT
+		FROM CO_BOARD C
+        WHERE CO_STATUS = 'Y' AND CO_TYPE='팁 &amp; 노하우'
+        ORDER BY CO_DATE DESC
+	</select>
+	
+	<select id="selectcoBoardTotalContentTip" resultType="_int">
+		SELECT COUNT(*) FROM CO_BOARD WHERE CO_TYPE='팁 &amp; 노하우'
+	</select>
+	
+	<select id="selectBoardListQA" resultType="coboard">
+		SELECT C.*, 
+			(SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK, (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_CONO = C.CO_NO) COMMENTCOUNT
+		FROM CO_BOARD C
+        WHERE CO_STATUS = 'Y' AND CO_TYPE='고민 &amp; 질문'
+        ORDER BY CO_DATE DESC
+	</select>
+	
+	<select id="selectcoBoardTotalContentsQA" resultType="_int">
+		SELECT COUNT(*) FROM CO_BOARD WHERE CO_TYPE='고민 &amp; 질문'
+	</select>
+	
+	<select id="selectBoardListToAdmin" resultType="coboard">
+		SELECT C.*, 
+			(SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK, (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_CONO = C.CO_NO) COMMENTCOUNT
+		FROM CO_BOARD C
+        WHERE CO_STATUS = 'Y' AND CO_TYPE='관리자에게'
+        ORDER BY CO_DATE DESC
+	</select>
+	
+	<select id="selectcoBoardTotalContentsToAdmin" resultType="_int">
+		SELECT COUNT(*) FROM CO_BOARD WHERE CO_TYPE='관리자에게'
+	</select>
+	
+
+	
+	
+</mapper>

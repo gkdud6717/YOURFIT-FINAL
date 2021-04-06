@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="memberMapper">
+
+	<insert id="joinMember" parameterType="Member">
+		INSERT INTO MEMBER 
+		VALUES( SEQ_MEMBERNO.NEXTVAL, #{m_Id}, #{m_Pwd},
+				#{m_Name}, #{m_Nick}, #{m_Gender}, #{m_Email},
+				#{m_Phone}, #{m_Address}, DEFAULT, DEFAULT)
+	</insert>
+
+	<select id="loginMember" parameterType="string" resultType="Member">
+		SELECT * FROM MEMBER
+		WHERE M_ID = #{userId}
+	</select>
+
+	<select id="idChk" statementType="CALLABLE"	parameterType="hashmap">
+			{ CALL ID_DUP_CHK( #{M_ID, mode=IN, jdbcType=VARCHAR}, #{result, mode=OUT, jdbcType=NUMERIC, javaType=integer} ) }	
+	</select>
+	
+	<select id="nickChk" statementType="CALLABLE"	parameterType="hashmap">
+			{ CALL NICK_DUP_CHK( #{M_NICK, mode=IN, jdbcType=VARCHAR}, #{result, mode=OUT, jdbcType=NUMERIC, javaType=integer} ) }	
+	</select>
+	
+	<select id="phoneChk" statementType="CALLABLE"	parameterType="hashmap">
+			{ CALL PHONE_DUP_CHK( #{M_PHONE, mode=IN, jdbcType=VARCHAR}, #{result, mode=OUT, jdbcType=NUMERIC, javaType=integer} ) }	
+	</select>
+	
+	<select id="searchId" parameterType="string" resultType="Member">
+		SELECT * FROM MEMBER
+		WHERE M_PHONE = #{phone_address}
+	</select>
+	
+	<select id="searchpw" parameterType="string" resultType="Member">
+		SELECT * FROM MEMBER
+		WHERE M_ID = #{userInfo}
+	</select>
+	
+	<update id="updatePassword" parameterType="Member">
+		UPDATE MEMBER SET
+		M_PWD = #{m_Pwd}
+		WHERE M_ID = #{m_Id}
+	</update>
+</mapper>

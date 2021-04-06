@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mypage">
+	
+	<resultMap type="cbBoard" id="cbBoard"></resultMap>
+	<resultMap type="boardcomment" id="boardcomment"></resultMap>
+	<resultMap type="notice" id="notice"></resultMap>
+	
+	<resultMap type="coboard" id="coboardMap"></resultMap>
+	
+	<resultMap type="DtBoard" id="resultDtBoard">
+		<id property="dt_No" column="dt_No"/>
+		<result property="dt_Title" column="dt_Title"/>
+		<result property="dt_Content" column="DT_CONTENT"/>
+		<result property="dt_Count" column="DT_COUNT" />
+		<result property="dt_Type" column="DT_TYPE" />
+		<result property="status" column="STATUS" />
+		<result property="dt_Mno" column="DT_MNO" />
+		<result property="nick" column="M_NICK"/>
+		<collection property="files" ofType="boardfile">
+			<id property="f_No" column="f_No"/>
+			<result property="f_Cname" column="F_CNAME" />
+			<result property="f_UploadDate" column="F_UPLOADDATE" />
+		</collection>
+	</resultMap>
+	
+	<resultMap type="AdBoard" id="resultAdBoard">
+		<id property="ad_No" column="ad_No"/>
+		<result property="ad_Title" column="ad_Title"/>
+		<result property="ad_Content" column="AD_CONTENT"/>
+		<result property="ad_Count" column="AD_COUNT" />
+		<result property="status" column="STATUS" />
+		<result property="ad_Mno" column="AD_MNO" />
+		<result property="ad_Date" column="AD_DATE"/>
+		<result property="nick" column="M_NICK"/>
+		<collection property="files" ofType="boardfile">
+			<id property="f_No" column="f_No"/>
+			<result property="f_Cname" column="F_CNAME" />
+			<result property="f_UploadDate" column="F_UPLOADDATE" />
+		</collection>
+	</resultMap>
+	
+	<resultMap type="event" id="eventMap">
+		<id property="e_No" column="E_NO"/>
+		<result property="e_Title" column="E_TITLE"/>
+		<result property="e_Content" column="E_CONTENT" />
+		<result property="e_Date" column="E_DATE" />
+		<result property="e_Count" column="E_COUNT" />
+		<result property="e_Status" column="E_STATUS" />
+		<result property="e_Start" column="E_START" />
+		<result property="e_End" column="E_END" />
+		<collection property="files" ofType="boardfile">
+			<id property="f_No" column="f_No"/>
+			<result property="f_Cname" column="F_CNAME" />
+			<result property="f_UploadDate" column="F_UPLOADDATE" />
+		</collection>
+	</resultMap>
+	
+	<resultMap type="Question" id="resultQuestion">
+		<id property="q_No" column="q_No"/>
+		<result property="q_Title" column="q_Title"/>
+		<result property="q_Content" column="q_Content"/>
+		<result property="q_Date" column="q_Date" />
+		<result property="q_Pno" column="q_Pno" />
+		<result property="q_Mno" column="q_Mno" />
+		<result property="q_Answer" column="q_Answer" />
+		<result property="p_Name" column="p_Name" />
+		<collection property="files" ofType="productimg">
+			<id property="i_No" column="i_No"/>
+			<result property="i_ChangeName" column="I_CHANGENAME" />
+			<result property="i_UploadDate" column="I_UPLOADDATE" />
+			<result property="i_Pno" column="i_Pno" />
+		</collection>
+		</resultMap>
+		
+		<resultMap type="Orders" id="OrdersMap">
+		<id property="o_No" column="o_No"/>
+			<result property="o_Pno" column="o_Pno"/>
+			<result property="o_Date" column="o_Date"/>
+			<result property="o_Amount" column="o_Amount" />
+			<result property="o_Paymethod" column="o_Paymethod" />
+			<result property="o_Payamount" column="o_Payamount" />
+			<result property="o_Paystatus" column="o_Paystatus" />
+			<result property="o_Mno" column="o_Mno" />
+			<result property="p_Name" column="p_Name" />
+			<result property="p_Price" column="p_Price" />
+			
+			<result property="m_Name" column="m_Name" />
+			<result property="m_Email" column="m_Email" />
+			<result property="m_Phone" column="m_Phone" />
+			<result property="m_Address" column="m_Address" />
+			
+			<collection property="files" ofType="productimg">
+				<id property="i_No" column="i_No"/>
+				<result property="i_ChangeName" column="I_CHANGENAME" />
+				<result property="i_UploadDate" column="I_UPLOADDATE" />
+				<result property="i_Pno" column="i_Pno" />
+			</collection>
+		</resultMap>
+	
+	<!-- 회원 -->
+	<select id="selectOneMember" resultType="Member">
+		SELECT MEMBER.*, (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_MNO = #{m_No}) COMMENTCOUNT,
+                 (SELECT COUNT(*) FROM CO_BOARD WHERE CO_MNO = #{m_No}) BOARDCOUNT
+		FROM MEMBER
+		WHERE M_ID = #{m_Id}
+	</select>
+	
+	<update id="updateMember" parameterType="Member">
+		 UPDATE MEMBER
+		 SET M_NICK = #{ m_Nick },
+		 	 M_ADDRESS = #{ m_Address },
+			 M_PHONE = #{ m_Phone }
+		 WHERE M_NO = #{ m_No }
+	</update>
+	
+	<delete id="deleteMember" parameterType="string">
+		DELETE FROM MEMBER WHERE M_ID = #{m_No}
+	</delete>
+	
+	<select id="selectcoBoardList" parameterType="_int" resultType="coboard">
+		SELECT C.*, 
+			(SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK, (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_CONO = C.CO_NO) COMMENTCOUNT
+		FROM CO_BOARD C 
+        WHERE CO_STATUS = 'Y' AND CO_MNO = #{ m_No }
+        ORDER BY CO_DATE DESC
+	</select>
+	
+	<select id="selectcoBoardTotalContents" resultType="_int"> 
+		SELECT COUNT(*) FROM CO_BOARD
+		WHERE CO_MNO = #{ m_No }
+	</select>
+	
+	<delete id="deletePost" parameterType="string">
+		DELETE FROM CO_BOARD
+		WHERE CO_NO = #{co_No}
+	</delete>
+	
+	<select id="selectCommentList" parameterType="_int" resultType="boardcomment">
+		SELECT * FROM BOARD_COMMENT
+        WHERE BC_MNO = #{ m_No }
+        ORDER BY BC_DATE DESC
+	</select>
+	
+	<select id="selectCommentTotalContents" resultType="_int">
+		SELECT COUNT(*) FROM BOARD_COMMENT
+        WHERE BC_MNO = #{ m_No }
+	</select>
+	
+	<select id="memberQuestionList" parameterType="_int" resultMap="resultQuestion">
+		SELECT QUESTION.*, PRODUCT.P_NAME, PRODUCT_IMG.*
+		FROM QUESTION
+		JOIN PRODUCT ON(QUESTION.Q_PNO = PRODUCT.P_NO)
+		JOIN PRODUCT_IMG ON(PRODUCT.P_NO = PRODUCT_IMG.I_PNO)
+		WHERE Q_MNO = #{ m_No }
+        ORDER BY Q_DATE DESC, PRODUCT_IMG.I_CHANGENAME ASC
+	</select>
+	
+	<select id="memberQuestionTotalContents" resultType="_int">
+		SELECT COUNT(*) FROM QUESTION
+        WHERE Q_MNO = #{ m_No }
+	</select>
+	
+	<select id="memberOrderList" parameterType="_int" resultMap="OrdersMap">
+		SELECT ORDERS.*, PRODUCT.P_NAME, PRODUCT_IMG.*
+		FROM ORDERS
+		JOIN PRODUCT ON(ORDERS.O_PNO = PRODUCT.P_NO)
+		JOIN PRODUCT_IMG ON(PRODUCT.P_NO = PRODUCT_IMG.I_PNO)
+		WHERE O_MNO = #{ o_No}
+        ORDER BY O_DATE DESC, PRODUCT_IMG.I_CHANGENAME ASC
+	</select>
+	
+	<select id="memberOrderTotalContents" resultType="_int">
+		SELECT COUNT(*) FROM ORDERS
+        WHERE O_MNO = #{ m_No }
+	</select>
+	
+	<delete id="deleteQuestion" parameterType="String">
+		DELETE FROM QUESTION
+		WHERE Q_NO = #{q_No}
+	</delete>
+	
+	<!-- //////////////////관리자/////////////////////   -->
+	
+	<select id="selectMember" resultType="Member">SELECT * FROM MEMBER ORDER BY M_NO ASC</select>
+	<select id="selectMemberY" resultType="Member">SELECT * FROM MEMBER WHERE M_SUSPENSION = 'Y' ORDER BY M_NO ASC</select>
+	<select id="selectMemberN" resultType="Member">SELECT * FROM MEMBER WHERE M_SUSPENSION = 'N' ORDER BY M_NO ASC</select>
+	
+	<select id="selectMemberTotal" resultType="_int">SELECT COUNT(*) FROM MEMBER</select>
+	<select id="selectMemberTotalY" resultType="_int">SELECT COUNT(*) FROM MEMBER WHERE M_SUSPENSION = 'Y'</select>
+	<select id="selectMemberTotalN" resultType="_int">SELECT COUNT(*) FROM MEMBER WHERE M_SUSPENSION = 'N'</select>
+	<select id="todayJoinMember" resultType="_int">
+		SELECT COUNT(*)
+		FROM MEMBER 
+		WHERE TO_CHAR(M_JOINDATE, 'yyyymmdd') = TO_CHAR(SYSDATE, 'yyyymmdd')
+	</select>
+	
+	<select id="selectOneMem" resultType="Member">
+		SELECT * FROM MEMBER
+		WHERE M_NO = #{m_No}
+	</select>
+	
+	<select id="memberDetail" parameterType="_int" resultType="Member">
+		SELECT MEMBER.*, (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_MNO = #{m_No}) COMMENTCOUNT,
+                 (SELECT COUNT(*) FROM CO_BOARD WHERE CO_MNO = #{m_No}) BOARDCOUNT
+		FROM MEMBER
+		WHERE M_NO = #{m_No}
+	</select>
+	
+	<update id="suspendMember" parameterType="Member">
+		UPDATE MEMBER SET
+		M_SUSPENSION = #{m_Suspension}
+		WHERE M_NO = #{m_No}
+	</update>
+	
+	<!-- 관리자 칼로리 -->
+	<select id="selectcbBoard" resultType="_int"> 
+		SELECT COUNT(*) FROM CAL_BOARD
+	</select>
+	
+	<select id="managementCB" resultMap="cbBoard">
+		SELECT SUBSTR(CB_NO, 3) AS NO, CAL_BOARD.*, MEMBER.M_NICK
+		FROM CAL_BOARD, MEMBER
+		WHERE CAL_BOARD.CB_MNO = MEMBER.M_NO
+	</select>
+	
+	<insert id="insertcbBoard" parameterType="cbBoard" > 
+		INSERT INTO CAL_BOARD VALUES ( 'CB'||CAL_BOARD_SEQ.NEXTVAL, #{cb_foodname}, #{cb_unit}, #{cb_cal}, #{cb_carbohydrate}, #{cb_protein}, #{cb_fat}, 0, #{cb_mno})
+	</insert>
+	
+	<select id="selectOnecbBoard" resultType="cbBoard">
+		SELECT * FROM CAL_BOARD
+		WHERE CB_NO = #{cn_no}
+	</select>
+	
+	<update id="updatecbBoard" parameterType="cbBoard">
+		UPDATE CAL_BOARD
+		SET CB_FOODNAME = #{cb_foodname},
+		    CB_UNIT = #{cb_unit},
+		    CB_CAL = #{cb_cal},
+		    CB_CARBOHYDRATE = #{cb_carbohydrate},
+		    CB_PROTEIN = #{cb_protein},
+		    CB_FAT = #{cb_fat}		    
+		WHERE CB_NO = #{cb_no}
+	</update> 
+	
+	<delete id="deletecbBoard" parameterType="string">
+		DELETE FROM CAL_BOARD 
+		WHERE CB_NO = #{cb_no}
+	</delete>
+	
+	<!-- 다이어트 팁 -->
+	<select id="selectdtBoardList" resultMap="resultDtBoard">
+		SELECT TO_NUMBER(SUBSTR(DT_NO, 3)) AS DT_INDEX, DT_BOARD.*, BOARD_FILE.*
+		FROM DT_BOARD
+		JOIN BOARD_FILE ON(DT_BOARD.DT_NO = BOARD_FILE.F_DTNO)
+		JOIN MEMBER ON(DT_MNO = MEMBER.M_NO)
+		ORDER BY DT_INDEX DESC
+	</select>
+	<select id="selectdtBoardTotalContents" resultType="_int">
+		SELECT COUNT(*) FROM DT_BOARD
+	</select>
+	
+	<select id="selectdtBoardListY" resultMap="resultDtBoard">
+		SELECT TO_NUMBER(SUBSTR(DT_NO, 3)) AS DT_INDEX, DT_BOARD.*, BOARD_FILE.*
+		FROM DT_BOARD
+		JOIN BOARD_FILE ON(DT_BOARD.DT_NO = BOARD_FILE.F_DTNO)
+		JOIN MEMBER ON(DT_MNO = MEMBER.M_NO)
+		WHERE STATUS = 'Y'
+		ORDER BY DT_INDEX DESC
+	</select>
+	<select id="selectdtBoardTotalContentsY" resultType="_int">
+		SELECT COUNT(*) FROM DT_BOARD WHERE STATUS = 'Y'
+	</select>
+	
+	<select id="selectdtBoardListN" resultMap="resultDtBoard">
+		SELECT TO_NUMBER(SUBSTR(DT_NO, 3)) AS DT_INDEX, DT_BOARD.*, BOARD_FILE.*
+		FROM DT_BOARD
+		JOIN BOARD_FILE ON(DT_BOARD.DT_NO = BOARD_FILE.F_DTNO)
+		JOIN MEMBER ON(DT_MNO = MEMBER.M_NO)
+		WHERE STATUS = 'N'
+		ORDER BY DT_INDEX DESC
+	</select>
+	<select id="selectdtBoardTotalContentsN" resultType="_int">
+		SELECT COUNT(*) FROM DT_BOARD WHERE STATUS = 'N'
+	</select>
+	
+	<!-- 커뮤니티 -->
+	<select id="selectcoBoard" resultType="coboard">
+		SELECT C.*, 
+			(SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK, (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_CONO = C.CO_NO) COMMENTCOUNT
+		FROM CO_BOARD C
+        WHERE CO_STATUS = 'Y'
+        ORDER BY CO_DATE DESC
+	</select>
+	
+	<select id="selectcoBoardListcount"  resultType="coboard">
+		SELECT C.*, 
+			(SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK, (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_CONO = C.CO_NO) COMMENTCOUNT
+		FROM CO_BOARD C 
+        WHERE CO_STATUS = 'Y'
+        ORDER BY CO_COUNT DESC
+	</select>
+	
+	<select id="selectcoBoardListcomment"  resultType="coboard">
+		SELECT C.*, 
+			(SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK, (SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_CONO = C.CO_NO) COMMENTCOUNT
+		FROM CO_BOARD C 
+        WHERE CO_STATUS = 'Y'
+        ORDER BY COMMENTCOUNT DESC
+	</select>
+	
+	<select id="selectcoBoardTotalContent" resultType="_int">
+		SELECT COUNT(*) FROM CO_BOARD
+	</select>
+	
+	<update id="updateStatus" parameterType="DtBoard">
+		UPDATE DT_BOARD SET
+		STATUS = #{status}
+		WHERE DT_NO = #{dt_No}
+	</update>
+	
+	<!-- 공지사항 -->
+	
+	<select id="selectNotice" resultType="_int"> 
+		SELECT COUNT(*) FROM NOTICE
+	</select>
+	
+	<select id="managementNotice" resultMap="notice">
+		SELECT N_NO, N_TITLE, N_MNO, N_DATE, MEMBER.M_NAME
+		FROM NOTICE, MEMBER
+		WHERE NOTICE.N_MNO = MEMBER.M_NO
+	</select>
+	
+	<insert id="insertNotice" parameterType="notice" > 
+		INSERT INTO NOTICE (N_NO, N_MNO, N_TITLE, N_CONTENT, N_DATE)
+        VALUES (NOTICE_SEQ.NEXTVAL, #{n_mno}, #{n_title}, #{n_content}, SYSDATE) 
+	</insert>
+	
+	<select id="noticeUpdateView" resultType="notice">
+		SELECT * FROM NOTICE WHERE N_NO = #{n_no} 
+	</select>
+	
+	<update id="noticeUpdate" parameterType="notice">
+		UPDATE NOTICE
+        SET N_TITLE = #{n_title},
+            N_CONTENT = #{n_content}
+        WHERE N_NO = #{n_no}
+	</update> 
+	
+	<delete id="noticeDelete" parameterType="string">
+		 DELETE FROM NOTICE WHERE N_NO = #{n_no}
+	</delete>
+	
+	<select id="selectHTboardList" resultType="htboard">
+	SELECT HT.*,(SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_HTNO = HT.HT_NO) COMMENTCOUNT
+		FROM HT_BOARD HT
+        ORDER BY HT_DATE DESC
+	</select>
+	
+	<select id="selectTotalContentsHT" resultType="_int">
+		SELECT COUNT(*) FROM HT_BOARD
+	</select>
+	
+	<select id="womanMember" resultType="_int">SELECT COUNT(*) FROM MEMBER WHERE M_GENDER = 'F'</select>
+	<select id="manMember" resultType="_int">SELECT COUNT(*) FROM MEMBER WHERE M_GENDER = 'M'</select>
+	
+	<select id="dataJoinList" resultType="dateJoin">
+		SELECT TO_CHAR(M_JOINDATE, 'YY/MM/DD') as DAYJOIN, COUNT(*) as DAYJOINCNT,
+		       COUNT(DECODE(M_GENDER, 'M', 1, NULL)) MANCOUNT,
+		       COUNT(DECODE(M_GENDER, 'F', 1, NULL)) WOMANCOUNT
+		FROM MEMBER
+		GROUP BY TO_CHAR(M_JOINDATE, 'YY/MM/DD')
+		ORDER BY dayJoin ASC
+	</select>
+
+	<select id="selectQuestionList" resultType="coboard">
+		SELECT CO_BOARD.*, MEMBER.M_NICK AS NICK
+		FROM CO_BOARD
+		JOIN MEMBER ON(MEMBER.M_NO = CO_BOARD.CO_MNO)
+        WHERE CO_TYPE = '관리자에게'
+        ORDER BY CO_DATE DESC
+	</select>
+	
+	<select id="selectProductQuestionList" resultType="Question">
+		SELECT Q.*,(SELECT M_NICK FROM MEMBER WHERE M_NO = Q.Q_MNO) Q_NICK 
+		FROM QUESTION Q
+		WHERE Q_ANSWER IS NULL
+	</select>
+	
+	<select id="selectQuestionTotalContents" resultType="_int">
+		SELECT COUNT(*) FROM CO_BOARD
+		WHERE CO_TYPE = '관리자에게'
+	</select>
+	
+	<select id="selectProductQuestionTotalContents" resultType="_int">
+		SELECT COUNT(*) FROM QUESTION
+		WHERE Q_ANSWER IS NULL 
+	</select>
+	
+	<select id="HomeTrainingCount" resultType="boardCount">
+		SELECT COUNT(*) AS TOTAL, SUM(HT_COUNT) AS COUNT, ht_type AS TYPE
+		FROM HT_BOARD 
+		GROUP BY HT_TYPE
+	</select>
+	
+	<select id="bestHT" resultType="htboard">
+		SELECT HT_TITLE, HT_COUNT, HT_TYPE
+		FROM HT_BOARD
+		WHERE ROWNUM &lt;= 1
+		ORDER BY HT_COUNT
+	</select>
+	
+	<select id="bestHomeTraining" resultType="boardCount"> 
+		SELECT HT_TYPE AS TYPE, HT_TITLE AS TITLE, HT_COUNT AS COUNT, HT_SRC AS SRC, HT_NO AS NO
+		FROM ( SELECT HT_TYPE, HT_TITLE, HT_COUNT, HT_SRC, HT_NO, ROW_NUMBER() OVER(PARTITION BY HT_TYPE ORDER BY HT_COUNT DESC) as RowIdx
+		FROM HT_BOARD) 					
+		WHERE RowIdx = 1 			<!-- ROW_NUMBER() 그룹 내 순위 결정 함수  -->
+		ORDER BY HT_COUNT DESC      <!-- ROW_NUMBER() OVER(PARTITION BY [그룹핑할 컬럼] ORDER BY [정렬할 컬럼]) -->
+	</select>
+	
+	<update id="insertAnswer" parameterType="Question">
+		UPDATE QUESTION
+		SET Q_ANSWER = #{q_Answer}
+		WHERE Q_NO = #{q_No}
+	</update>
+	
+	<!-- 관리자 주문 관리 -->
+	<select id="selectOrdersList" resultMap="OrdersMap">
+		SELECT ORDERS.*, MEMBER.*, PRODUCT.P_NAME, PRODUCT_IMG.*
+		FROM ORDERS
+		JOIN MEMBER ON(ORDERS.O_MNO = MEMBER.M_NO)
+		JOIN PRODUCT ON(ORDERS.O_PNO = PRODUCT.P_NO)
+		JOIN PRODUCT_IMG ON(PRODUCT.P_NO = PRODUCT_IMG.I_PNO)
+		ORDER BY O_DATE DESC, PRODUCT_IMG.I_CHANGENAME ASC
+	</select>
+	
+	<select id="selectOrdersListY" resultMap="OrdersMap">
+		SELECT ORDERS.*, MEMBER.*, PRODUCT.P_NAME, PRODUCT_IMG.*
+		FROM ORDERS
+		JOIN MEMBER ON(ORDERS.O_MNO = MEMBER.M_NO)
+		JOIN PRODUCT ON(ORDERS.O_PNO = PRODUCT.P_NO)
+		JOIN PRODUCT_IMG ON(PRODUCT.P_NO = PRODUCT_IMG.I_PNO)
+        WHERE O_PAYSTATUS = 'Y'
+		ORDER BY O_DATE DESC, PRODUCT_IMG.I_CHANGENAME ASC
+	</select>
+	
+	<select id="selectOrdersListN" resultMap="OrdersMap">
+		SELECT ORDERS.*, MEMBER.*, PRODUCT.P_NAME, PRODUCT_IMG.*
+		FROM ORDERS
+		JOIN MEMBER ON(ORDERS.O_MNO = MEMBER.M_NO)
+		JOIN PRODUCT ON(ORDERS.O_PNO = PRODUCT.P_NO)
+		JOIN PRODUCT_IMG ON(PRODUCT.P_NO = PRODUCT_IMG.I_PNO)
+        WHERE O_PAYSTATUS = 'N'
+		ORDER BY O_DATE ASC, PRODUCT_IMG.I_CHANGENAME ASC
+	</select>
+	
+	<select id="selectOrdersTotalContents" resultType="_int"> SELECT COUNT(*) FROM ORDERS </select>
+	<select id="selectOrdersTotalContentsY" resultType="_int"> SELECT COUNT(*) FROM ORDERS WHERE O_PAYSTATUS = 'Y' </select>
+	<select id="selectOrdersTotalContentsN" resultType="_int"> SELECT COUNT(*) FROM ORDERS WHERE O_PAYSTATUS = 'N' </select>
+	
+	<select id="selectOrderViewList" resultType="_int" resultMap="OrdersMap">
+		SELECT ORDERS.*, MEMBER.*, PRODUCT.P_NAME, PRODUCT_IMG.*
+		FROM ORDERS
+		JOIN MEMBER ON(ORDERS.O_MNO = MEMBER.M_NO)
+		JOIN PRODUCT ON(ORDERS.O_PNO = PRODUCT.P_NO)
+		JOIN PRODUCT_IMG ON(PRODUCT.P_NO = PRODUCT_IMG.I_PNO)
+		WHERE O_NO = #{ o_No }
+		ORDER BY PRODUCT_IMG.I_CHANGENAME ASC
+	</select>
+	
+	<update id="updateOrder" parameterType="_int">
+		UPDATE ORDERS 
+		SET O_PAYSTATUS = 'Y'
+		WHERE O_NO = #{ o_No }
+	</update>
+	
+	<select id="yesterdaySale" resultType="_int">
+		SELECT NVL(SUM(O_PAYAMOUNT), 0) TODAYSALE
+		FROM ORDERS
+		WHERE O_DATE = TO_CHAR(SYSDATE-1) AND O_PAYSTATUS = 'Y'
+	</select>
+	
+	<select id="todaySale" resultType="_int">
+		SELECT NVL(SUM(O_PAYAMOUNT), 0) TODAYSALE
+		FROM ORDERS
+		WHERE O_DATE = TO_CHAR(SYSDATE) AND O_PAYSTATUS = 'Y'
+	</select>
+	
+	<select id="monthSale" resultType="_int">
+		SELECT NVL(SUM(O_PAYAMOUNT), 0) MONTHSALE
+		FROM ORDERS
+		WHERE O_DATE BETWEEN TO_DATE('2021-01-01', 'YYYY-MM-DD') AND TO_DATE('2021-01-31', 'YYYY-MM-DD') AND O_PAYSTATUS = 'Y'
+	</select>
+	
+	<select id="yesterdayOrders" resultType="_int">
+		SELECT COUNT(*)
+		FROM ORDERS
+		WHERE O_DATE = TO_CHAR(SYSDATE-1) AND O_PAYSTATUS = 'Y'
+	</select>
+	
+	<select id="todayOrders" resultType="_int">
+		SELECT COUNT(*)
+		FROM ORDERS
+		WHERE O_DATE = TO_CHAR(SYSDATE) AND O_PAYSTATUS = 'Y'
+	</select>
+	
+	<select id="livingSale" resultType="_int">
+		SELECT NVL(SUM(O_PAYAMOUNT), 0) 
+		FROM ORDERS
+		JOIN PRODUCT ON(ORDERS.O_PNO = PRODUCT.P_NO)
+		WHERE PRODUCT.P_TYPE = 'Living' AND 
+		O_DATE BETWEEN TO_DATE('2021-01-01', 'YYYY-MM-DD') 
+		AND TO_DATE('2021-01-31', 'YYYY-MM-DD') 
+		AND O_PAYSTATUS = 'Y'
+	</select>
+	
+	<select id="foodSale" resultType="_int">
+		SELECT NVL(SUM(O_PAYAMOUNT), 0) 
+		FROM ORDERS
+		JOIN PRODUCT ON(ORDERS.O_PNO = PRODUCT.P_NO)
+		WHERE PRODUCT.P_TYPE = 'Food/Health' AND 
+		O_DATE BETWEEN TO_DATE('2021-01-01', 'YYYY-MM-DD') 
+		AND TO_DATE('2021-01-31', 'YYYY-MM-DD') 
+		AND O_PAYSTATUS = 'Y'
+	</select>
+	
+	<select id="beautySale" resultType="_int">
+		SELECT NVL(SUM(O_PAYAMOUNT), 0) 
+		FROM ORDERS
+		JOIN PRODUCT ON(ORDERS.O_PNO = PRODUCT.P_NO)
+		WHERE PRODUCT.P_TYPE = 'Beauty' AND 
+		O_DATE BETWEEN TO_DATE('2021-01-01', 'YYYY-MM-DD') 
+		AND TO_DATE('2021-01-31', 'YYYY-MM-DD') 
+		AND O_PAYSTATUS = 'Y'
+	</select>
+	
+	<select id="weekendSaleSum" resultType="_int">
+		SELECT NVL(SUM(O_PAYAMOUNT), 0) SALE
+		FROM ORDERS
+		WHERE O_DATE BETWEEN TO_CHAR(SYSDATE-6) AND TO_CHAR(SYSDATE) AND O_PAYSTATUS = 'Y'
+	</select>
+	
+	<select id="previousweekendSum" resultType="_int">
+		SELECT NVL(SUM(O_PAYAMOUNT), 0) SALE
+		FROM ORDERS
+		WHERE O_DATE BETWEEN TO_CHAR(SYSDATE-14) AND TO_CHAR(SYSDATE-7) AND O_PAYSTATUS = 'Y'
+	</select>
+	
+	<select id="weekendSale" resultType="sale">
+		SELECT O_DATE, NVL(SUM(O_PAYAMOUNT), 0) SALE
+		FROM ORDERS
+		WHERE O_DATE BETWEEN TO_CHAR(SYSDATE-6) AND TO_CHAR(SYSDATE) AND O_PAYSTATUS = 'Y'
+		GROUP BY O_DATE
+		ORDER BY O_DATE  
+	</select>
+	
+	<select id="previousweekendSale" resultType="sale">
+		SELECT O_DATE, NVL(SUM(O_PAYAMOUNT), 0) SALE
+		FROM ORDERS
+		WHERE O_DATE BETWEEN TO_CHAR(SYSDATE-14) AND TO_CHAR(SYSDATE-7) AND O_PAYSTATUS = 'Y'
+		GROUP BY O_DATE
+		ORDER BY O_DATE  
+	</select>
+	
+	<select id="selectBestProduct" resultType="Orders">
+		SELECT SUM(O_AMOUNT) O_AMOUNT, PRODUCT.P_NAME, PRODUCT.P_PRICE
+		FROM ORDERS
+		JOIN PRODUCT ON(ORDERS.O_PNO = PRODUCT.P_NO) 
+		WHERE O_DATE BETWEEN TO_DATE('2021-01-01', 'YYYY-MM-DD') 
+		AND TO_DATE('2021-01-31', 'YYYY-MM-DD')
+		GROUP BY PRODUCT.P_NAME, PRODUCT.P_PRICE
+		ORDER BY O_AMOUNT DESC
+	</select>
+	
+	<select id="womanOrders" resultType="_int">
+		SELECT NVL(SUM(O_AMOUNT), 0)
+		FROM ORDERS
+		JOIN MEMBER ON(O_MNO = MEMBER.M_NO)
+		WHERE O_DATE BETWEEN TO_DATE('2021-01-01', 'YYYY-MM-DD') 
+		AND TO_DATE('2021-01-31', 'YYYY-MM-DD')
+		AND M_GENDER = 'F'
+	</select>
+	
+	<select id="manOrders" resultType="_int">
+		SELECT NVL(SUM(O_AMOUNT), 0)
+		FROM ORDERS
+		JOIN MEMBER ON(O_MNO = MEMBER.M_NO)
+		WHERE O_DATE BETWEEN TO_DATE('2021-01-01', 'YYYY-MM-DD') 
+		AND TO_DATE('2021-01-31', 'YYYY-MM-DD')
+		AND M_GENDER = 'M'
+	</select>
+	
+	<select id="allOrders" resultType="_int">
+		SELECT NVL(SUM(O_AMOUNT), 0)
+		FROM ORDERS
+		JOIN MEMBER ON(O_MNO = MEMBER.M_NO)
+		WHERE O_DATE BETWEEN TO_DATE('2021-01-01', 'YYYY-MM-DD') 
+		AND TO_DATE('2021-01-31', 'YYYY-MM-DD')
+	</select>
+	
+	<select id="selectadBoardList" resultMap="resultAdBoard">
+		SELECT TO_NUMBER(SUBSTR(AD_NO, 3)) AS AD_INDEX, AD.*, BOARD_FILE.*
+		FROM AD
+		JOIN BOARD_FILE ON(AD.AD_NO = BOARD_FILE.F_ADNO)
+		JOIN MEMBER ON(AD_MNO = MEMBER.M_NO)
+		ORDER BY AD_INDEX DESC
+	</select>
+	
+	<select id="selectadBoardListY" resultMap="resultAdBoard">
+		SELECT TO_NUMBER(SUBSTR(AD_NO, 3)) AS AD_INDEX, AD.*, BOARD_FILE.*
+		FROM AD
+		JOIN BOARD_FILE ON(AD.AD_NO = BOARD_FILE.F_ADNO)
+		JOIN MEMBER ON(AD_MNO = MEMBER.M_NO)
+		WHERE STATUS = 'Y'
+		ORDER BY AD_INDEX DESC
+	</select>
+
+	<select id="selectadBoardListN" resultMap="resultAdBoard">
+		SELECT TO_NUMBER(SUBSTR(AD_NO, 3)) AS AD_INDEX, AD.*, BOARD_FILE.*
+		FROM AD
+		JOIN BOARD_FILE ON(AD.AD_NO = BOARD_FILE.F_ADNO)
+		JOIN MEMBER ON(AD_MNO = MEMBER.M_NO)
+		WHERE STATUS = 'N'
+		ORDER BY AD_INDEX DESC
+	</select>
+	
+	<select id="selectadBoardTotalContents" resultType="_int">
+		SELECT COUNT(*) FROM AD
+	</select>
+	
+	<select id="selectadBoardTotalContentsY" resultType="_int">
+		SELECT COUNT(*) FROM AD WHERE STATUS = 'Y'
+	</select>
+	
+	<select id="selectadBoardTotalContentsN" resultType="_int">
+		SELECT COUNT(*) FROM AD WHERE STATUS = 'N'
+	</select>
+	
+	<update id="adupdateStatus" parameterType="adboard">
+		UPDATE AD SET
+		STATUS = #{status}
+		WHERE AD_NO = #{ad_No}
+	</update>
+	
+</mapper>
+
+

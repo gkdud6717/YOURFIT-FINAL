@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="eventMapper">
+	<resultMap type="event" id="eventMap">
+		<id property="e_No" column="E_NO"/>
+		<result property="e_Title" column="E_TITLE"/>
+		<result property="e_Content" column="E_CONTENT" />
+		<result property="e_Date" column="E_DATE" />
+		<result property="e_Count" column="E_COUNT" />
+		<result property="e_Status" column="E_STATUS" />
+		<result property="e_Start" column="E_START" />
+		<result property="e_End" column="E_END" />
+		<collection property="files" ofType="boardfile">
+			<id property="f_No" column="f_No"/>
+			<result property="f_Cname" column="F_CNAME" />
+			<result property="f_UploadDate" column="F_UPLOADDATE" />
+		</collection>
+	</resultMap>
+	
+	<select id="selectEventList" resultMap="eventMap">
+		SELECT *
+		FROM EVENT
+		JOIN BOARD_FILE ON(EVENT.E_NO = BOARD_FILE.F_ENO)
+		JOIN MEMBER ON(E_MNO = MEMBER.M_NO)
+		WHERE E_STATUS = 'Y'
+		ORDER BY E_END DESC 
+	</select>
+	
+	<select id="selectTotalContentsEvent" resultType="_int">
+		SELECT COUNT(*) FROM EVENT
+		WHERE E_STATUS = 'Y'
+	</select>
+	
+    <select id="selectEventOne" parameterType="_int" resultType="event">
+		SELECT E.*, 
+        (SELECT M_NICK FROM MEMBER WHERE M_NO = E.E_MNO) NICK,
+        (SELECT F_CNAME FROM BOARD_FILE WHERE F_ENO = E.E_NO) NO
+		FROM EVENT E
+        WHERE E_NO = #{e_No}
+	</select>
+	
+	<update id="updateEventCount" parameterType="_int">
+		UPDATE EVENT
+		SET E_COUNT = E_COUNT + 1
+		WHERE E_NO = #{e_No}
+	</update>
+	
+	<select id="selectEventFileList" resultType="boardfile">
+		SELECT * FROM BOARD_FILE WHERE F_ENO = #{f_Eno}
+	</select>
+	
+	<!-- 검색 기능 -->
+	<select id="eventSearch" parameterType="hashMap" resultMap="eventMap">
+		SELECT *
+		FROM EVENT
+		JOIN BOARD_FILE ON(EVENT.E_NO = BOARD_FILE.F_ENO)
+		
+		<if test='searchType.equals("title")'>
+		WHERE E_TITLE LIKE CONCAT(CONCAT('%', #{keyword}), '%')
+		</if>
+		
+		<if test='searchType.equals("content")'>
+		WHERE E_CONTENT LIKE CONCAT(CONCAT('%', #{keyword}), '%')
+		</if>
+		
+		<if test='searchType.equals("title_content")'>
+		WHERE E_TITLE LIKE CONCAT(CONCAT('%', #{keyword}), '%')
+		OR  E_CONTENT LIKE CONCAT(CONCAT('%', #{keyword}), '%')
+		</if>
+		AND E_STATUS = 'Y'
+		ORDER BY E_END DESC
+	</select>
+	
+	<select id="selectTotalSearchEvent" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM EVENT
+		WHERE E_TITLE LIKE '%' || #{keyword} || '%'
+	</select>
+	
+	<insert id="insertEvent" parameterType="event">
+		INSERT INTO EVENT
+		VALUES(EVENT_SEQ.NEXTVAL, #{e_Mno}, #{e_Title}, #{e_Content}, SYSDATE, 0, 'Y',  #{e_Start}, #{e_End})
+	</insert>
+	
+	<insert id="insertEventFile" parameterType="boardfile">
+		<selectKey keyProperty="e_No" resultType="_int" order="BEFORE">
+			SELECT EVENT_SEQ.CURRVAL FROM DUAL
+		</selectKey>
+		INSERT INTO BOARD_FILE(F_NO, F_ENO, F_TYPE, F_NAME, F_CNAME, F_UPLOADDATE)
+		VALUES(BOARD_FILE_SEQ.NEXTVAL, #{e_No}, '1', #{f_Name}, #{f_Cname}, SYSDATE)
+	</insert>
+	
+	<delete id="deleteAttachment" parameterType="_int">
+		DELETE FROM BOARD_FILE
+		WHERE F_ENO = #{e_No}
+	</delete>
+	
+	<insert id="updateAttachment" parameterType="boardfile">
+	 INSERT INTO BOARD_FILE(F_NO, F_ENO, F_TYPE, F_NAME, F_CNAME, F_UPLOADDATE) VALUES
+		(BOARD_FILE_SEQ.NEXTVAL, #{f_Eno}, '1', #{f_Name}, #{f_Cname}, SYSDATE )
+	</insert>
+	
+	<update id="updateEvent" parameterType="event">
+		UPDATE EVENT
+		SET E_TITLE = #{e_Title},
+		    E_CONTENT = #{e_Content},
+		    E_START = #{e_Start},
+		    E_END = #{e_End}	
+		WHERE E_NO = #{e_No}
+	</update>
+	
+	<update id="deleteEvent" parameterType="_int">
+		UPDATE EVENT
+		SET E_STATUS = 'N'
+		WHERE E_NO = #{e_No}
+	</update>
+</mapper>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="htboardMapper">
+
+<!-- property 는 member의 변수이름 cloumn은 데이터베이스 컬럼이름(대소문자 상관x) -->
+	<resultMap type="htboard" id="htboardMap">
+	
+	</resultMap>
+
+
+	<select id="selecthtBoardList" resultType="htboard">
+	SELECT HT.*,(SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_HTNO = HT.HT_NO) COMMENTCOUNT
+		FROM HT_BOARD HT
+        ORDER BY HT_DATE DESC
+	</select>
+
+
+	<select id="selectBoardTotalContents" resultType="_int">
+		SELECT COUNT(*) FROM HT_BOARD
+	</select>
+	
+	<select id="selectOneBoard" parameterType="string" resultType="htboard">
+		  SELECT HT.*,(SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_HTNO = HT.HT_NO) COMMENTCOUNT FROM HT_BOARD HT WHERE HT_NO = #{ht_No} 
+<!-- 	SELECT C.*, (SELECT M_NICK FROM MEMBER WHERE M_NO = C.CO_MNO) NICK, (SELECT F_CNAME FROM BOARD_FILE WHERE F_CONO=#{co_No}) FILES  FROM CO_BOARD C WHERE CO_NO = #{co_No}; -->
+	</select>
+
+	<update id="updateReadCount" parameterType="string">
+		UPDATE HT_BOARD
+		SET HT_COUNT = HT_COUNT + 1
+		WHERE HT_NO = #{ht_No}
+	</update>
+	
+	<insert id="insertboardComment" parameterType="boardcomment">
+		INSERT INTO BOARD_COMMENT(BC_NO, BC_CONTENT, BC_DATE, BC_TYPE, BC_HTNO, BC_MNO) VALUES (BOARD_COMMENT_SEQ.NEXTVAL, #{bc_Content}, SYSDATE, 1, #{bc_Htno}, #{bc_Mno})
+	</insert>
+	
+	<select id="selectBoardComment" parameterType="string" resultType="boardcomment">
+		<!-- SELECT * FROM BOARD_COMMENT WHERE BC_CONO = #{co_No} -->
+		SELECT BC.*,(SELECT M_NICK FROM MEMBER WHERE M_NO = BC.BC_MNO) NICK FROM BOARD_COMMENT BC WHERE BC_HTNO = #{ht_No}
+	</select>
+	
+	<delete id="deleteBoardComment" parameterType="_int">
+		DELETE FROM BOARD_COMMENT WHERE BC_NO = #{bc_no}
+	</delete>
+	
+	<update id="updateBoardComment" parameterType="boardcomment">
+		UPDATE BOARD_COMMENT SET BC_CONTENT = #{bc_Content} WHERE BC_NO = #{bc_No}
+	</update>
+	
+	<insert id="inserthtBoard" parameterType="htboard">
+		INSERT INTO HT_BOARD (HT_NO, HT_TYPE, HT_TITLE, HT_CONTENT, HT_COUNT, HT_TIME, HT_PART, HT_LEVEL, HT_CAL, HT_INTRO, HT_MNO, HT_DATE, HT_SRC) VALUES 
+			('HT' ||HT_BOARD_SEQ.NEXTVAL, #{ht_Type} , #{ht_Title} ,  #{ht_Content}, 0 ,  #{ht_Time},  #{ht_Part},  #{ht_Level},  #{ht_Cal},  #{ht_Intro},  #{ht_Mno}, SYSDATE,  #{ht_Src})
+	</insert>
+	
+	<update id="boardUpdate" parameterType="htboard">
+		UPDATE HT_BOARD
+		SET HT_TITLE = #{ht_Title},
+		    HT_CONTENT = #{ht_Content},
+		    HT_TIME = #{ht_Time},
+		    HT_PART = #{ht_Part},
+		    HT_CAL = #{ht_Cal},
+		    HT_SRC = #{ht_Src},
+		    HT_TYPE = #{ht_Type},
+		    HT_LEVEL = #{ht_Level},
+		    HT_INTRO = #{ht_Intro}
+		WHERE HT_NO = #{ht_No}	
+	</update>
+	
+	<delete id="boardDelete" parameterType="String">
+		DELETE FROM HT_BOARD
+		WHERE HT_NO = #{ht_No}
+	</delete>
+	
+	<select id="htboardSearch" resultType="htboard" parameterType="hashMap">
+		SELECT HT.*,(SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_HTNO = HT.HT_NO) COMMENTCOUNT
+		FROM HT_BOARD HT
+		<if test='searchType.equals("title")'> WHERE HT_TITLE LIKE CONCAT(CONCAT('%', #{keyword}), '%') </if>
+
+		<if test='searchType.equals("content")'> WHERE HT_CONTENT LIKE CONCAT(CONCAT('%', #{keyword}), '%') </if>
+		
+		<if test='searchType.equals("title_content")'> WHERE HT_TITLE LIKE CONCAT(CONCAT('%', #{keyword}), '%')OR HT_CONTENT LIKE CONCAT(CONCAT('%', #{keyword}), '%') </if>
+		ORDER BY HT_DATE DESC 
+	</select>
+
+	<select id="htboardSearchCount" resultType="int" parameterType="String">
+		SELECT COUNT(*) FROM HT_BOARD WHERE HT_TITLE LIKE '%' || #{keyword} || '%' 
+	</select>
+	
+	<!-- ㅇㅇㅇㅇㅇㅇㅇㅇ- -->
+	
+	<select id="selecthtBoardListBody" resultType="htboard">
+		SELECT HT.*,(SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_HTNO = HT.HT_NO) COMMENTCOUNT
+		FROM HT_BOARD HT
+		WHERE HT_TYPE='전신'
+        ORDER BY HT_DATE DESC
+	</select>
+	
+	
+	<select id="selecthtBoardTotalContentsBody" resultType="_int">
+		SELECT COUNT(*) FROM HT_BOARD WHERE HT_TYPE='전신'
+	</select>
+	
+	<select id="selecthtBoardListUp" resultType="htboard">
+		SELECT HT.*,(SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_HTNO = HT.HT_NO) COMMENTCOUNT
+		FROM HT_BOARD HT
+		WHERE HT_TYPE='상체'
+        ORDER BY HT_DATE DESC
+	</select>
+	
+	
+	<select id="selecthtBoardTotalContentsUp" resultType="_int">
+		SELECT COUNT(*) FROM HT_BOARD WHERE HT_TYPE='상체'
+	</select>
+	
+	<select id="selecthtBoardListLow" resultType="htboard">
+		SELECT HT.*,(SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_HTNO = HT.HT_NO) COMMENTCOUNT
+		FROM HT_BOARD HT
+		WHERE HT_TYPE='하체'
+        ORDER BY HT_DATE DESC
+	</select>
+	
+	
+	<select id="selecthtBoardTotalContentsLow" resultType="_int">
+		SELECT COUNT(*) FROM HT_BOARD WHERE HT_TYPE='하체'
+	</select>
+	
+	<select id="selecthtBoardListMid" resultType="htboard">
+		SELECT HT.*,(SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_HTNO = HT.HT_NO) COMMENTCOUNT
+		FROM HT_BOARD HT
+		WHERE HT_TYPE='복부'
+        ORDER BY HT_DATE DESC
+	</select>
+	
+	
+	<select id="selecthtBoardTotalContentsMid" resultType="_int">
+		SELECT COUNT(*) FROM HT_BOARD WHERE HT_TYPE='복부'
+	</select>
+	
+	<select id="selecthtBoardListStret" resultType="htboard">
+		SELECT HT.*,(SELECT COUNT(*) FROM BOARD_COMMENT WHERE BC_HTNO = HT.HT_NO) COMMENTCOUNT
+		FROM HT_BOARD HT
+		WHERE HT_TYPE='스트레칭'
+        ORDER BY HT_DATE DESC
+	</select>
+	
+	
+	<select id="selecthtBoardTotalContentsStret" resultType="_int">
+		SELECT COUNT(*) FROM HT_BOARD WHERE HT_TYPE='스트레칭'
+	</select>
+
+	
+</mapper>
